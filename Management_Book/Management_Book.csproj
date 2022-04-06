@@ -39,7 +39,9 @@
     <Reference Include="DevExpress.Data.v21.2" />
     <Reference Include="DevExpress.Xpf.Ribbon.v21.2" />
     <Reference Include="DevExpress.Printing.v21.2.Core" />
-    <Reference Include="DevExpress.Images.v21.2" />
+    <Reference Include="DevExpress.Images.v21.2">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="DevExpress.Mvvm.v21.2" />
     <Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v21.2" />
     <Reference Include="System" />

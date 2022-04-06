@@ -60,9 +60,9 @@
                     </dxr:ApplicationMenu.RightPane>
                     <dxr:ApplicationMenu.BottomPane>
                         <StackPanel Orientation="Horizontal">
-                            <Button Click="OptionsButton_Click" Content="Options" Width="100" Margin="0,0,10,0" />
+                            <Button Content="Options" Width="100" Margin="0,0,10,0" />
 
-                            <Button Click="ExitButton_Click" Content="Exit" Width="100" />
+                            <Button Content="Exit" Width="100" />
 
                         </StackPanel>
                     </dxr:ApplicationMenu.BottomPane>
@@ -81,9 +81,7 @@
                                                   ItemsSource="{dxe:EnumItemsSource EnumType={x:Type dxr:RibbonStyle}}"/>
                     </dxb:BarEditItem.EditSettings>
                 </dxb:BarEditItem>
-                <dxb:BarButtonItem Name="bAbout" Content="About" 
-                               
-                               ItemClick="bAbout_ItemClick" />
+                <dxb:BarButtonItem Name="bAbout" Content="About" />
             </dxr:RibbonControl.PageHeaderItems>
             <!--endregion #PageHeaderItemLinks-->
 
@@ -99,7 +97,6 @@
                 <dxr:RibbonPage Caption="Dashboard">
                     <dxr:RibbonPageGroup Name="pgFile" Caption="File" 
                                          ShowCaptionButton="True"
-                                         CaptionButtonClick="groupFile_CaptionButtonClick"
                                          >
                         <dxb:BarButtonItem Name="bNew" Content="New" 
                              
@@ -145,7 +142,7 @@
 
 
                     </dxr:RibbonPageGroup>
-                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="True" CaptionButtonClick="groupEdit_CaptionButtonClick">
+                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="True">
                         <dxb:BarButtonItem Name="bPaste" Content="Paste" 
                                RibbonStyle="Large"/>
 
@@ -178,6 +175,13 @@
                 <dxr:RibbonPage Caption="Tools">
 
                 </dxr:RibbonPage>
+                <dxr:RibbonPage Caption="Hệ Thống">
+                    <dxr:RibbonPageGroup Caption="Tài Khoản">
+                        <dxb:BarButtonItem Content="Đăng Nhập" RibbonStyle="All" Glyph="{dx:DXImage SvgImages/Business Objects/BO_User.svg}"/>
+                        <dxb:BarButtonItem Content="Đổi Mật Khẩu" Glyph="{dx:DXImage SvgImages/Icon Builder/Security_Key.svg}"/>
+                        <dxb:BarButtonItem Content="Đăng Xuất" Glyph="{dx:DXImage SvgImages/XAF/Action_Exit.svg}"/>
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
             </dxr:RibbonDefaultPageCategory>
             <!--endregion #DefaultPageCategory-->
 
@@ -200,7 +204,7 @@
         <!--endregion #RibbonStatusBarControl-->
 
 
-        <RichTextBox x:Name="textEditor" Grid.Row="1" BorderThickness="0" SelectionChanged="textEditor_SelectionChanged" Grid.ColumnSpan="2"/>
+        <RichTextBox x:Name="textEditor" Grid.Row="1" BorderThickness="0" Grid.ColumnSpan="2"/>
     </Grid>
 
 </dx:ThemedWindow>
