@@ -6,189 +6,77 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
-    Title="MainWindow" Height="800" Width="1000">
+    Title="MainWindow" Height="800" Width="1000" Loaded="ThemedWindow_Loaded">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <dxr:RibbonControl x:Name="RibbonControl" Grid.Row="0"  
+        <dxr:RibbonControl x:Name="RibbonControl"  
                                ApplicationButtonText="File" 
                                PageCategoryAlignment="Right"
-                               RibbonStyle="Office2019" 
+                               RibbonStyle="Office2019" VerticalAlignment="Center" Height="158" 
                                >
-            <!--region #AppMenu-->
-            <dxr:RibbonControl.ApplicationMenu>
-                <dxr:ApplicationMenu RightPaneWidth="280" ShowRightPane="True">
-                    <dxr:ApplicationMenu.ItemLinks>
-                        <dxb:BarButtonItemLink BarItemName="bNew"/>
-                        <dxb:BarButtonItemLink BarItemName="bOpen"/>
-                        <dxb:BarItemLinkSeparator/>
-                        <dxb:BarSplitButtonItemLink BarItemName="sbSave"/>
-                        <dxb:BarButtonItemLink BarItemName="bPrint"/>
 
-                        <dxb:BarItemLinkSeparator/>
-                        <dxb:BarButtonItemLink BarItemName="bAbout"/>
-                    </dxr:ApplicationMenu.ItemLinks>
-                    <dxr:ApplicationMenu.RightPane>
-                        <Border Background="White" BorderThickness="1,0,0,0" BorderBrush="LightGray">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-                                <Border BorderThickness="0,0,0,1" BorderBrush="LightGray" Margin="7,5,5,0">
-                                    <Label FontWeight="Bold">Recent Documents:</Label>
-                                </Border>
-                                <ListBox Grid.Row="1" BorderThickness="0" Margin="2,0,0,0" >
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                                <Border BorderThickness="0,0,0,1" BorderBrush="Black">
-                                                    <TextBlock Text="{Binding Number}"/>
-                                                </Border>
-                                                <TextBlock Text="{Binding FileName}" Margin="7,0,0,0"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                    
-                                </ListBox>
-                            </Grid>
-                        </Border>
-                    </dxr:ApplicationMenu.RightPane>
-                    <dxr:ApplicationMenu.BottomPane>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Click="OptionsButton_Click" Content="Options" Width="100" Margin="0,0,10,0" />
-
-                            <Button Click="ExitButton_Click" Content="Exit" Width="100" />
-
-                        </StackPanel>
-                    </dxr:ApplicationMenu.BottomPane>
-                </dxr:ApplicationMenu>
-            </dxr:RibbonControl.ApplicationMenu>
-            <!--endregion #AppMenu-->
-
-            <!--region #PageHeaderItemLinks-->
-            <dxr:RibbonControl.PageHeaderItems>
-                <dxb:BarEditItem x:Name="eRibbonStyle" Content="Ribbon Style:" 
-                    EditWidth="100" 
-                    ClosePopupOnChangingEditValue="True" 
-                    EditValue="{Binding RibbonStyle, ElementName=RibbonControl}">
-                    <dxb:BarEditItem.EditSettings>
-                        <dxe:ComboBoxEditSettings IsTextEditable="False" PopupMaxHeight="250" 
-                                                  ItemsSource="{dxe:EnumItemsSource EnumType={x:Type dxr:RibbonStyle}}"/>
-                    </dxb:BarEditItem.EditSettings>
-                </dxb:BarEditItem>
-                <dxb:BarButtonItem Name="bAbout" Content="About" 
-                               
-                               ItemClick="bAbout_ItemClick" />
-            </dxr:RibbonControl.PageHeaderItems>
-            <!--endregion #PageHeaderItemLinks-->
-
-            <!--region #ToolbarItemLinks-->
-            <dxr:RibbonControl.ToolbarItemLinks>
-                <dxb:BarButtonItemLink BarItemName="bOpen"/>
-                <dxb:BarButtonItemLink BarItemName="bSave"/>
-            </dxr:RibbonControl.ToolbarItemLinks>
-            <!--endregion #ToolbarItemLinks-->
 
             <!--region #DefaultPageCategory-->
             <dxr:RibbonDefaultPageCategory>
-                <dxr:RibbonPage Caption="Dashboard">
-                    <dxr:RibbonPageGroup Name="pgFile" Caption="File" 
-                                         ShowCaptionButton="True"
-                                         CaptionButtonClick="groupFile_CaptionButtonClick"
-                                         >
-                        <dxb:BarButtonItem Name="bNew" Content="New" 
-                             
-                               Description="Creates a new document."
-                               Hint="Creates a blank document."
-                               RibbonStyle="Large" />
-
-                        <dxb:BarButtonItem Name="bOpen" Content="Open" 
-                              
-                               Description="Opens a file."
-                               Hint="Opens a file."
-                               RibbonStyle="SmallWithText"/>
-
-                        <dxb:BarButtonItem Name="bClose" Content="Close" 
-                              
-                               Hint="Closes the current document"
-                               RibbonStyle="SmallWithText"/>
-
-                        <dxb:BarButtonItem Name="bPrint" Content="Print" 
-                               
-                               Description="Prints the document."
-                               Hint="Prints the document." 
-                               RibbonStyle="SmallWithText"/>
-
-                        <dxb:BarItemLinkSeparator/>
-
-                        <dxb:BarSplitButtonItem Name="sbSave" Content="Save" 
-                                  
-                                    RibbonStyle="Large">
-                            <dxb:BarSplitButtonItem.PopupControl >
-                                <dxb:PopupMenu>
-                                    <dxb:BarButtonItem Name="bSave" Content="Save" 
-                                       
-                                        Description="Saves the document."
-                                        Hint="Saves the document."/>
-                                    <dxb:BarButtonItem Name="bSaveAs" Content="Save As..." 
-                                      
-                                        Description="Save Document As..."
-                                        Hint="Save Document As..."/>
-                                </dxb:PopupMenu>
-                            </dxb:BarSplitButtonItem.PopupControl>
-                        </dxb:BarSplitButtonItem>
-
-
+                <dxr:RibbonPage Caption="Master data">
+                    <dxr:RibbonPageGroup Caption="Import">
+                        <dxb:BarButtonItem x:Name="import_btn" ItemClick="import_btn_ItemClick"  Content="Excel" LargeGlyph="{dx:DXImage SvgImages/Export/ExportToXLSX.svg}"/>
                     </dxr:RibbonPageGroup>
-                    <dxr:RibbonPageGroup Caption="Edit" ShowCaptionButton="True" CaptionButtonClick="groupEdit_CaptionButtonClick">
-                        <dxb:BarButtonItem Name="bPaste" Content="Paste" 
-                               RibbonStyle="Large"/>
-
-                        <dxb:BarButtonItem Name="bCut" Content="Cut" 
-                                RibbonStyle="SmallWithText"/>
-                        <dxb:BarButtonItem Name="bCopy" Content="Copy" 
-                               RibbonStyle="SmallWithText"/>
-                        <dxb:BarButtonItem Name="bClear" Content="Clear" 
-                                RibbonStyle="SmallWithText"/>
-
+                    <dxr:RibbonPageGroup Caption="Category">
+                        <dxb:BarButtonItem x:Name="add_category_btn" ItemClick="add_category_btn_ItemClick" Content="Add" LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_AddCircled.svg}"/>
+                        <dxb:BarButtonItem x:Name="delete_category_btn" ItemClick="delete_category_btn_ItemClick"  Content="Delete" LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_DeleteCircled.svg}"/>
+                    </dxr:RibbonPageGroup>
+                    <dxr:RibbonPageGroup Caption="Product">
+                        <dxb:BarButtonItem x:Name="add_product_btn" ItemClick="add_product_btn_ItemClick" Content="Add" LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_AddCircled.svg}"/>
+                        <dxb:BarButtonItem x:Name="update_product_btn" ItemClick="update_product_btn_ItemClick" Content="Update" LargeGlyph="{dx:DXImage SvgImages/XAF/Action_Edit.svg}"/>
+                        <dxb:BarButtonItem x:Name="delete_product_btn" ItemClick="delete_product_btn_ItemClick" Content="Delete" LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_Trash.svg}"/>
                     </dxr:RibbonPageGroup>
 
-                    <dxr:RibbonPageGroup Caption="Format" ShowCaptionButton="False">
-                        <!--region #BarButtonGroup-->
-                        <dxr:BarButtonGroup Name="bgFontShape" RibbonStyle="SmallWithoutText">
-                            <dxb:BarCheckItem Name="bBold" Content="Bold" />
-                            <dxb:BarCheckItem Name="bItalic" Content="Italic"  />
-                            <dxb:BarCheckItem Name="bUnderline" Content="Underline"  />
-                        </dxr:BarButtonGroup>
-                        <!--endregion #BarButtonGroup-->
-
-                    </dxr:RibbonPageGroup>
                 </dxr:RibbonPage>
-                <dxr:RibbonPage Caption="Products">
+
+                <dxr:RibbonPage Caption="Sale">
 
                 </dxr:RibbonPage>
-                <dxr:RibbonPage Caption="Orders">
+
+                <dxr:RibbonPage Caption="Report">
 
                 </dxr:RibbonPage>
-                <dxr:RibbonPage Caption="Tools">
 
-                </dxr:RibbonPage>
+
             </dxr:RibbonDefaultPageCategory>
             <!--endregion #DefaultPageCategory-->
 
-    
+
         </dxr:RibbonControl>
+
+        <dx:DXDockPanel Grid.Row="1" LastChildFill="True">
+            <dx:DXTabControl x:Name="tabs" SelectedIndex="{Binding SelectedTabItem, ElementName=tabs}">
+                <dx:DXTabItem Header="Master data">
+                    <Grid Background="#00000000"/>
+                </dx:DXTabItem>
+                <dx:DXTabItem Header="Sale">
+                    <Grid Background="#00000000"/>
+                </dx:DXTabItem>
+                <dx:DXTabItem Header="Order">
+                    <Grid Background="#00000000"/>
+                </dx:DXTabItem>
+            </dx:DXTabControl>
+        </dx:DXDockPanel>
 
 
 
 
         <!--region #RibbonStatusBarControl-->
-        <dxr:RibbonStatusBarControl Grid.Row="2" Name="StatusBar" IsSizeGripVisible="True" Grid.ColumnSpan="2">
+        <dxr:RibbonStatusBarControl Grid.Row="2" Name="StatusBar" IsSizeGripVisible="True" VerticalAlignment="Center" Height="24">
             <dxr:RibbonStatusBarControl.RightItems>
                 <dxb:BarStaticItem Name="bFileName" ItemMinWidth="150" AutoSizeMode="Fill" Content="Binding"/>
             </dxr:RibbonStatusBarControl.RightItems>
@@ -199,8 +87,6 @@
         </dxr:RibbonStatusBarControl>
         <!--endregion #RibbonStatusBarControl-->
 
-
-        <RichTextBox x:Name="textEditor" Grid.Row="1" BorderThickness="0" SelectionChanged="textEditor_SelectionChanged" Grid.ColumnSpan="2"/>
     </Grid>
 
 </dx:ThemedWindow>

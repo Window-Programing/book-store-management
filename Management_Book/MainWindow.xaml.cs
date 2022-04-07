@@ -1,6 +1,8 @@
 ﻿using DevExpress.Xpf.Core;
+using Management_Book.UserControl;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -24,6 +26,53 @@ namespace Management_Book
         {
             InitializeComponent();
             
+        }
+
+        private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void import_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void add_category_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void delete_category_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void add_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void update_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void delete_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            var screen = new ObservableCollection<TabItem>()
+            {
+                new TabItem() { Content = new MasterDataUserControl()},
+                new TabItem() { Content = new SaleUserControl() },
+                new TabItem() { Content = new ReportUserControl() }
+            };
+
+            tabs.ItemsSource = screen;
         }
     }
 }

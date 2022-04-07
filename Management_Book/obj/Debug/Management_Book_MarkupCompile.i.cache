@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\minht\source\repos\Management_Book\Management_Book\obj\Debug\
+C:\Users\minht\Desktop\GitHub\book-store-management\Management_Book\obj\Debug\
 Management_Book
 none
 false
 DEBUG;TRACE
-C:\Users\minht\source\repos\Management_Book\Management_Book\App.xaml
-1219584333
+C:\Users\minht\Desktop\GitHub\book-store-management\Management_Book\App.xaml
+4984513906
 
-6-793535042
+11150252917
 20-321465290
-MainWindow.xaml;
+MainWindow.xaml;UserControl\MasterDataUserControl.xaml;UserControl\ReportUserControl.xaml;UserControl\SaleUserControl.xaml;
 
 False
 
