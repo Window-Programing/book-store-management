@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aspose.Cells">
+      <HintPath>..\..\..\..\..\..\dll\Aspose.Cells.dll</HintPath>
+    </Reference>
     <Reference Include="DevExpress.Xpf.Core.v21.2" />
     <Reference Include="DevExpress.Data.Desktop.v21.2" />
     <Reference Include="DevExpress.Data.v21.2" />
@@ -43,6 +46,7 @@
     <Reference Include="DevExpress.Mvvm.v21.2" />
     <Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v21.2" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -63,13 +67,16 @@
     </ApplicationDefinition>
     <Compile Include="Model\MyShopEntities.cs" />
     <Compile Include="Model\MyShopModel.cs" />
-    <Compile Include="UserControl\MasterDataUserControl.xaml.cs">
+    <Compile Include="UserControls\MasterDataUserControl.xaml.cs">
       <DependentUpon>MasterDataUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\ReportUserControl.xaml.cs">
+    <Compile Include="UserControls\OrderUserControl.xaml.cs">
+      <DependentUpon>OrderUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ReportUserControl.xaml.cs">
       <DependentUpon>ReportUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControl\SaleUserControl.xaml.cs">
+    <Compile Include="UserControls\SaleUserControl.xaml.cs">
       <DependentUpon>SaleUserControl.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
@@ -84,15 +91,19 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UserControl\MasterDataUserControl.xaml">
+    <Page Include="UserControls\MasterDataUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControl\ReportUserControl.xaml">
+    <Page Include="UserControls\OrderUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UserControl\SaleUserControl.xaml">
+    <Page Include="UserControls\ReportUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\SaleUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -125,6 +136,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="View\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

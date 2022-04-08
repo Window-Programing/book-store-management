@@ -1,5 +1,5 @@
 ﻿using DevExpress.Xpf.Core;
-using Management_Book.UserControl;
+using Management_Book.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,7 +25,7 @@ namespace Management_Book
         public MainWindow()
         {
             InitializeComponent();
-            
+
         }
 
         private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
@@ -63,16 +63,21 @@ namespace Management_Book
 
         }
 
+        public class TabDataItem
+        {
+            public string HeaderText { get; set; }
+            public UserControl Content { get; set; }
+        }
         private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var screen = new ObservableCollection<TabItem>()
+            var screen = new ObservableCollection<DXTabItem>()
             {
-                new TabItem() { Content = new MasterDataUserControl()},
-                new TabItem() { Content = new SaleUserControl() },
-                new TabItem() { Content = new ReportUserControl() }
+                new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
+                new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
+                new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
             };
 
-            tabs.ItemsSource = screen;
+            dXTabControl1.ItemsSource = screen;
         }
     }
 }

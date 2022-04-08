@@ -4,9 +4,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
-    Title="MainWindow" Height="800" Width="1000" Loaded="ThemedWindow_Loaded">
+    Title="MainWindow" 
+    Height="800" Width="1000" 
+    WindowStartupLocation="CenterScreen"
+    Loaded="ThemedWindow_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -17,6 +21,14 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.Resources>
+            <DataTemplate x:Key="ItemHeaderTemplate">
+                <TextBlock Text="{Binding HeaderText}"/>
+            </DataTemplate>
+            <DataTemplate x:Key="ItemContentTemplate">
+                
+            </DataTemplate>
+        </Grid.Resources>
 
         <dxr:RibbonControl x:Name="RibbonControl"  
                                ApplicationButtonText="File" 
@@ -55,22 +67,17 @@
             </dxr:RibbonDefaultPageCategory>
             <!--endregion #DefaultPageCategory-->
 
-
         </dxr:RibbonControl>
 
-        <dx:DXDockPanel Grid.Row="1" LastChildFill="True">
-            <dx:DXTabControl x:Name="tabs" SelectedIndex="{Binding SelectedTabItem, ElementName=tabs}">
-                <dx:DXTabItem Header="Master data">
-                    <Grid Background="#00000000"/>
-                </dx:DXTabItem>
-                <dx:DXTabItem Header="Sale">
-                    <Grid Background="#00000000"/>
-                </dx:DXTabItem>
-                <dx:DXTabItem Header="Order">
-                    <Grid Background="#00000000"/>
-                </dx:DXTabItem>
-            </dx:DXTabControl>
-        </dx:DXDockPanel>
+        <dx:DXTabControl Grid.Row="1"
+                         Name="dXTabControl1">
+            <dx:DXTabControl.ItemContainerStyle>
+                <Style TargetType="dx:DXTabItem">
+                    <Setter Property="Header" Value="{Binding Header}" />
+                    <Setter Property="Content" Value="{Binding Content}" />
+                </Style>
+            </dx:DXTabControl.ItemContainerStyle>
+        </dx:DXTabControl>
 
 
 
