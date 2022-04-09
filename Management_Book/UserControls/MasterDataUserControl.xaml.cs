@@ -182,7 +182,7 @@ namespace Management_Book.UserControls
             ListViewProduct.ItemsSource = _viewModel.SelectedProducts;
             _viewModel.PageSize = 10;
 
-            var workbook = new Workbook("C:\\Users\\minht\\Desktop\\GitHub\\book-store-management\\Management_Book\\BookData.xlsx");
+            var workbook = new Workbook("D:\\disk\\4-2\\windowsform\\MyShop\\book-store-management\\Management_Book\\BookData.xlsx");
             var categorySheet = workbook.Worksheets[0];
 
             Dictionary<string, int> categoriesDictionary = new Dictionary<string, int>();

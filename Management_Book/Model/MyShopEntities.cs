@@ -34,7 +34,7 @@ namespace Management_Book.Model
             {
                 connection.Open();
             }
-            catch (Exception ex) { }
+            catch (Exception ex) { string message = ex.Message; }
         }
         public static void closeConnection()
         {
@@ -43,7 +43,7 @@ namespace Management_Book.Model
                 if (connection != null)
                     connection.Close();
             }
-            catch (Exception ex) { }
+            catch (Exception ex) { string message =  ex.Message; }
         }
 
         public void insertProduct(MyShopModel.Product product)

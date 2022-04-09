@@ -39,6 +39,13 @@
 
             <!--region #DefaultPageCategory-->
             <dxr:RibbonDefaultPageCategory>
+                <dxr:RibbonPage Caption="Account">
+                    <dxr:RibbonPageGroup Caption="">
+                        <dxb:BarButtonItem Content="Login" Glyph="{dx:DXImage SvgImages/Business Objects/BO_User.svg}" RibbonStyle="All" Margin="10,0"/>
+                        <dxb:BarButtonItem Content="Logout" Glyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}" RibbonStyle="SmallWithText" Padding="0,8" Margin="0"/>
+                        <dxb:BarButtonItem Content="Change Pass" Glyph="{dx:DXImage SvgImages/Icon Builder/Security_Key.svg}" Padding="0,8"/>
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
                 <dxr:RibbonPage Caption="Master data">
                     <dxr:RibbonPageGroup Caption="Import">
                         <dxb:BarButtonItem x:Name="import_btn" ItemClick="import_btn_ItemClick"  Content="Excel" LargeGlyph="{dx:DXImage SvgImages/Export/ExportToXLSX.svg}"/>
