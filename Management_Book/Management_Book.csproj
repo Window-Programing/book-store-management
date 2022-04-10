@@ -84,6 +84,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Views\Frm_Login.xaml.cs">
+      <DependentUpon>Frm_Login.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Model\MyShopEntities.cs" />
     <Compile Include="Model\MyShopModel.cs" />
     <Compile Include="UserControls\MasterDataUserControl.xaml.cs">
@@ -98,6 +101,10 @@
     <Compile Include="UserControls\SaleUserControl.xaml.cs">
       <DependentUpon>SaleUserControl.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\Frm_Login.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -157,9 +164,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="View\" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
@@ -170,6 +174,12 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\login.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Views\login.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

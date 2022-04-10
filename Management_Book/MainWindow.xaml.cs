@@ -1,5 +1,6 @@
 ﻿using DevExpress.Xpf.Core;
 using Management_Book.UserControls;
+using Management_Book.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,7 +29,6 @@ namespace Management_Book
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
         private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
@@ -146,15 +146,19 @@ namespace Management_Book
         }
         private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            var screen = new ObservableCollection<DXTabItem>()
+            if (Frm_Login.IsActive())
             {
-                new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
-                new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
-                new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
-            };
+                var screen = new ObservableCollection<DXTabItem>()
+                {
+                    new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
+                    new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
+                    new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
+                };
 
-            dXTabControl1.ItemsSource = screen;
-
+                dXTabControl1.ItemsSource = screen;
+            }
+            else
+                System.Windows.Application.Current.Shutdown();
             //Kết nối db
             //string connectionString = AppConfig.ConnectionString();
             //var dao = new SqlDataAccess(connectionString);
@@ -171,15 +175,15 @@ namespace Management_Book
             //}
 
             //Đọc password
-            var cypherText = AppConfig.GetValue(AppConfig.Password);
-            var cypherTextInBytes = Convert.FromBase64String(cypherText);
+            //var cypherText = AppConfig.GetValue(AppConfig.Password);
+            //var cypherTextInBytes = Convert.FromBase64String(cypherText);
 
-            var entropyText = AppConfig.GetValue(AppConfig.Entropy);
-            var entropyInBytes = Convert.FromBase64String(entropyText);
+            //var entropyText = AppConfig.GetValue(AppConfig.Entropy);
+            //var entropyInBytes = Convert.FromBase64String(entropyText);
 
-            var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyInBytes, DataProtectionScope.CurrentUser);
-            var password = Encoding.UTF8.GetString(passwordInBytes);
-            MessageBox.Show(password);
+            //var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyInBytes, DataProtectionScope.CurrentUser);
+            //var password = Encoding.UTF8.GetString(passwordInBytes);
+            //MessageBox.Show(password);
         }
 
         private void saveButton_Click(object sender, RoutedEventArgs e)

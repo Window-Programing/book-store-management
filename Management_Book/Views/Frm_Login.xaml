@@ -1,0 +1,23 @@
+﻿<dx:ThemedWindow
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    x:Class="Management_Book.Views.Frm_Login"
+    Title="Frm_Login" Height="800" Width="1280" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ControlBoxButtonSet="Close"
+    >
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.Background>
+            <ImageBrush ImageSource="login.png"/>
+        </Grid.Background>
+        <dxe:TextEdit x:Name="TxtUsername" HorizontalAlignment="Left" Margin="778,320,0,0" VerticalAlignment="Top" Width="350" Height="50" FontSize="16"/>
+        <dxe:TextEdit x:Name="TxtPassword" HorizontalAlignment="Left" Margin="778,427,0,0" VerticalAlignment="Top" Width="350" Height="50" FontSize="16"/>
+        <dxe:CheckEdit HorizontalAlignment="Left" Margin="778,500,0,0" VerticalAlignment="Top" Width="185" Content="Save Login Information" FontSize="16" Foreground="White"/>
+        <dx:SimpleButton Content="OK" HorizontalAlignment="Left" Height="50" Margin="1028,538,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="2.091,0.016" Click="BtnOK_Click" CornerRadius="5"/>
+
+    </Grid>
+</dx:ThemedWindow>
