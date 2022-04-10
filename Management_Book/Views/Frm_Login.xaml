@@ -14,10 +14,10 @@
         <Grid.Background>
             <ImageBrush ImageSource="login.png"/>
         </Grid.Background>
-        <dxe:TextEdit x:Name="TxtUsername" HorizontalAlignment="Left" Margin="778,320,0,0" VerticalAlignment="Top" Width="350" Height="50" FontSize="16"/>
-        <dxe:TextEdit x:Name="TxtPassword" HorizontalAlignment="Left" Margin="778,427,0,0" VerticalAlignment="Top" Width="350" Height="50" FontSize="16"/>
-        <dxe:CheckEdit HorizontalAlignment="Left" Margin="778,500,0,0" VerticalAlignment="Top" Width="185" Content="Save Login Information" FontSize="16" Foreground="White"/>
+        <dxe:CheckEdit Margin="0,500,306.6,0" VerticalAlignment="Top" Content="Save Login Information" FontSize="16" Foreground="White" HorizontalAlignment="Right" Width="185"/>
         <dx:SimpleButton Content="OK" HorizontalAlignment="Left" Height="50" Margin="1028,538,0,0" VerticalAlignment="Top" Width="100" RenderTransformOrigin="2.091,0.016" Click="BtnOK_Click" CornerRadius="5"/>
+        <TextBox x:Name="TxtUsername" VerticalContentAlignment="Center" HorizontalAlignment="Right" Height="50" Margin="0,316,141.6,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="350" FontSize="18" FontStretch="SemiCondensed" Text="{x:Null}"/>
+        <PasswordBox VerticalContentAlignment="Center" x:Name="TxtPassword" Height="50" Margin="0,428,141.6,0" FontSize="18" IsEnabled="True" HorizontalAlignment="Right" Width="350" VerticalAlignment="Top"></PasswordBox>
 
     </Grid>
 </dx:ThemedWindow>

@@ -1,6 +1,8 @@
 ﻿using DevExpress.Xpf.Core;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -20,7 +22,6 @@ namespace Management_Book.Views
     /// </summary>
     public partial class Frm_Login : ThemedWindow
     {
-        bool IsDone = false;
         public Frm_Login()
         {
             InitializeComponent();
@@ -28,35 +29,36 @@ namespace Management_Book.Views
 
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-
-            if (TxtUsername.Text == string.Empty)
+            SqlConnection sqlCon = new SqlConnection(@"Data Source=localhost\DESKTOP-95BV1QQ; Initial Catalog=MyShop; Integrated Security=True;");
+            try
             {
-                TxtUsername.SelectAll();
-                return;
+                if (sqlCon.State == ConnectionState.Closed)
+                    sqlCon.Open();
+                String query = "SELECT COUNT(1) FROM User WHERE Username=@Username AND Password=@Password";
+                SqlCommand sqlCmd = new SqlCommand(query, sqlCon);
+                sqlCmd.CommandType = CommandType.Text;
+                sqlCmd.Parameters.AddWithValue("@Username", TxtUsername);
+                sqlCmd.Parameters.AddWithValue("@Password", TxtPassword);
+                int count = Convert.ToInt32(sqlCmd.ExecuteScalar());
+                if (count == 1)
+                {
+                    MainWindow dashboard = new MainWindow();
+                    dashboard.Show();
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Username or password is incorrect.");
+                }
             }
-            if (TxtPassword.Text == string.Empty)
+            catch (Exception ex)
             {
-                TxtPassword.SelectAll();
-                return;
+                MessageBox.Show(ex.Message);
             }
-            if (TxtUsername.Text != string.Empty && TxtPassword.Text != string.Empty && TxtUsername.Text == "admin" && TxtPassword.Text == "123")
+            finally
             {
-                IsDone = true;
+                sqlCon.Close();
             }
-            else
-                IsDone = false;
-            if (!IsDone)
-            {
-                MessageBox.Show("Error in your information", "error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            Close();
-        }
-
-        public static bool IsActive()
-        {
-            Frm_Login login = new Frm_Login();
-            login.ShowDialog();
-            return login.IsDone ? true : false;
         }
     }
 }
