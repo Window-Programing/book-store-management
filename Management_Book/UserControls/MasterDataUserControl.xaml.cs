@@ -30,6 +30,28 @@ namespace Management_Book.UserControls
     {
         MyShopModel.ViewModel _viewModel = new MyShopModel.ViewModel();
         BindingList<MyShopModel.Category> _categories;
+        class PagingRow
+        {
+            public int Page { get; set; }
+            public int TotalPages { get; set; }
+        }
+        class PagingInfo
+        {
+            public List<PagingRow> Items { get; set; }
+            public PagingInfo(int totalPages)
+            {
+                Items = new List<PagingRow>();
+
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    Items.Add(new PagingRow()
+                    {
+                        Page = i,
+                        TotalPages = totalPages
+                    });
+                }
+            }
+        }
 
         public MasterDataUserControl()
         {
@@ -65,20 +87,21 @@ namespace Management_Book.UserControls
             {
                 _viewModel.Products = _categories[i].Products;
                 _viewModel.CurrentPage = 1;
-
-                foreach(var pro in _viewModel.Products)
-                {
-                    Debug.WriteLine(pro.Name);
-                }
+                _viewModel.TotalPage = _viewModel.Products.Count / _viewModel.PageSize +
+                    (_viewModel.Products.Count % _viewModel.PageSize == 0 ? 0 : 1);
 
                 transDataToView(_viewModel.Products, _viewModel.SelectedProducts);
                 updatePaging(_viewModel);
+
+                currentPagingComboBox.ItemsSource = new PagingInfo(_viewModel.TotalPage).Items;
+                currentPagingComboBox.SelectedIndex = 0;
             }
         }
 
         private void firstButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CurrentPage = 1;
+            currentPagingComboBox.SelectedIndex = 0;
             updatePaging(_viewModel);
         }
         private void previousButton_Click(object sender, RoutedEventArgs e)
@@ -86,6 +109,7 @@ namespace Management_Book.UserControls
             if (_viewModel.CurrentPage > 1)
             {
                 _viewModel.CurrentPage -= 1;
+                currentPagingComboBox.SelectedIndex -= 1;
                 updatePaging(_viewModel);
             }
         }
@@ -94,12 +118,14 @@ namespace Management_Book.UserControls
             if (_viewModel.CurrentPage < _viewModel.TotalPage)
             {
                 _viewModel.CurrentPage += 1;
+                currentPagingComboBox.SelectedIndex += 1;
                 updatePaging(_viewModel);
             }
         }
         private void lastButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CurrentPage = _viewModel.TotalPage;
+            currentPagingComboBox.SelectedIndex = _viewModel.TotalPage - 1;
             updatePaging(_viewModel);
         }
         private void transDataToView(List<MyShopModel.Product> source, BindingList<MyShopModel.Product> view)
@@ -114,12 +140,19 @@ namespace Management_Book.UserControls
                                 .Take(view.PageSize)
                                 .ToList(),
                             _viewModel.SelectedProducts);
+        }
 
-            view.TotalItems = view.Products.Count;
-            view.TotalPage = view.TotalItems / view.PageSize +
-                (view.Products.Count % view.PageSize == 0 ? 0 : 1);
+        private void currentPagingComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var next = currentPagingComboBox.SelectedItem as PagingRow;
 
-            currentPagingTextBlock.Text = $"{view.CurrentPage}/{view.TotalPage}";
+            if(next != null)
+            {
+                _viewModel.CurrentPage = (int)next.Page;
+                updatePaging(_viewModel);
+            }
+            
+
         }
     }
 }

@@ -6,45 +6,84 @@
              xmlns:local="clr-namespace:Management_Book.UserControls"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" x:Class="Management_Book.UserControls.MasterDataUserControl"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="800"
+             Height="550" Width="950" 
              Loaded="UserControl_Loaded">
-    <Canvas>
-        <TextBlock Text="Category" FontSize="14" Canvas.Left="19" Canvas.Top="11" HorizontalAlignment="Center" VerticalAlignment="Top" />
-        <ComboBox x:Name="ComboBoxCategory" SelectionChanged="ComboBoxCategory_SelectionChanged"  SelectedValue="0"
-                  Width="200" Height="25" Canvas.Left="95" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}"/>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-        <!--<DataGrid x:Name="DataGirdProduct" Canvas.Left="20" Canvas.Top="55"/>-->
+    <DockPanel>
+        <Border Margin="10" Padding="10" CornerRadius="20" 
+                BorderThickness="1" BorderBrush="LightGray" 
+                    Background="#F5F5F5">
+            <DockPanel DockPanel.Dock="Left"  LastChildFill="True" Width="600">
 
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10,10,0,0">
+                    <TextBlock Text="Category" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                    <ComboBox x:Name="ComboBoxCategory" SelectionChanged="ComboBoxCategory_SelectionChanged"  SelectedValue="0"
+                         Width="200" Height="25" Margin="10,0,0,0"
+                              HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
 
+                <!--<DataGrid x:Name="DataGirdProduct" Canvas.Left="20" Canvas.Top="55"/>-->
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Canvas.Left="130" Canvas.Top="540" VerticalAlignment="Top">
-            <Button x:Name="firstButton" Width="40" Height="35" Content="&lt;&lt;" Click="firstButton_Click"/>
-            <Button x:Name="previousButton" Width="40" Height="35" Content="&lt;" Click="previousButton_Click"/>
-            <ComboBox x:Name="currentPagingTextBlock" Width="120" SelectedValue="0">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="Page "/>
-                            <TextBlock Text="{Binding Page}"/>
-                            <TextBlock Text=" / "/>
-                            <TextBlock Text="{Binding TotalPages}"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-            <Button x:Name="nextButton" Width="40" Height="35" Content="&gt;" Click="nextButton_Click"/>
-            <Button x:Name="lastButton" Width="40" Height="35" Content="&gt;&gt;" Click="lastButton_Click"/>
-        </StackPanel>
-        <dxg:GridControl Name="grid" AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" Height="465" Width="775" Canvas.Left="10" Canvas.Top="60" HorizontalAlignment="Left" VerticalAlignment="Center">
-            <dxg:GridControl.View>
-                <dxg:TableView/>
-            </dxg:GridControl.View>
-        </dxg:GridControl>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" 
+                        HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10">
+                    <Button x:Name="firstButton" Width="40" Height="35" Content="&lt;&lt;" Click="firstButton_Click"/>
+                    <Button x:Name="previousButton" Width="40" Height="35" Content="&lt;" Click="previousButton_Click"/>
+                    <ComboBox x:Name="currentPagingComboBox" Width="120" SelectedValue="0" SelectionChanged="currentPagingComboBox_SelectionChanged">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="Page "/>
+                                    <TextBlock Text="{Binding Page}"/>
+                                    <TextBlock Text=" / "/>
+                                    <TextBlock Text="{Binding TotalPages}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button x:Name="nextButton" Width="40" Height="35" Content="&gt;" Click="nextButton_Click"/>
+                    <Button x:Name="lastButton" Width="40" Height="35" Content="&gt;&gt;" Click="lastButton_Click"/>
+                </StackPanel>
 
-    </Canvas>
+                <dxg:GridControl Name="grid" DockPanel.Dock="Bottom" AutoGenerateColumns="None" 
+                             EnableSmartColumnsGeneration="True" 
+                             Width="560" Height="360" Margin="20,20,20,20"
+                             HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Name" Binding="{Binding Name}" Width="200"/>
+                        <dxg:GridColumn FieldName="Price" Binding="{Binding Price}"/>
+                        <dxg:GridColumn FieldName="Quantity" Binding="{Binding Quantity}" Width="50"/>
+                        <dxg:GridColumn FieldName="Image" Binding="{Binding Image}"/>
+                    </dxg:GridControl.Columns>
+                    <dxg:GridControl.View>
+                        <dxg:TableView AllowEditing="False"/>
+                    </dxg:GridControl.View>
+                </dxg:GridControl>
+
+            </DockPanel>
+        </Border>
+        <Border Margin="10" Padding="10" CornerRadius="20" 
+                BorderThickness="1" BorderBrush="LightGray" 
+                    Background="CadetBlue">
+            <DockPanel LastChildFill="False">
+                <StackPanel>
+                    <TextBlock Margin="0,10,0,0" Text="Thông tin sản phẩm" TextAlignment="Center" FontSize="25" FontStyle="Italic" Foreground="White"/>
+                    <StackPanel Margin="0,100,0,0">
+                        <TextBlock Margin="10, 10,0,0" Text="Tên sản phẩm" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="White"/>
+                        <TextBox Name="TextBox_Name" Text="{Binding ElementName=grid, Path=SelectedItem.Name, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <TextBlock Margin="10, 10,0,0" Text="Giá" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="White"/>
+                        <TextBox Name="TextBox_Price" Text="{Binding ElementName=grid, Path=SelectedItem.Price, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <TextBlock Margin="10, 10,0,0" Text="Số lượng" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="White"/>
+                        <TextBox Name="TextBox_Quantity" Text="{Binding ElementName=grid, Path=SelectedItem.Quantity, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="20" FontStyle="Normal" Foreground="Black" Width="250"/>
+
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+        
+    </DockPanel>
 </UserControl>
