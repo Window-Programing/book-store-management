@@ -121,6 +121,5 @@ namespace Management_Book.UserControls
 
             currentPagingTextBlock.Text = $"{view.CurrentPage}/{view.TotalPage}";
         }
-        
     }
 }

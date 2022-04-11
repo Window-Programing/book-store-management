@@ -61,6 +61,7 @@ namespace Management_Book.Model
                 connection.Open();
                 return connection;
             }
+
             catch (Exception ex) { }
             return null;
         }
@@ -71,7 +72,7 @@ namespace Management_Book.Model
                 if (connection.State  == System.Data.ConnectionState.Open)
                     connection.Close();
             }
-            catch (Exception ex) { }
+            catch (Exception ex) { string message =  ex.Message; }
         }
 
         public void truncateTable(string tableName)

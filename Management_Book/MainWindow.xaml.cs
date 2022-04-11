@@ -2,12 +2,22 @@
 using DevExpress.Xpf.Core;
 using Management_Book.Model;
 using Management_Book.UserControls;
+
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+
+using Management_Book.Views;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Configuration;
+using System.Data.SqlClient;
+
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,7 +39,6 @@ namespace Management_Book
         public MainWindow()
         {
             InitializeComponent();
-
         }
 
         private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
@@ -145,12 +154,13 @@ namespace Management_Book
         }
         private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
         {
+
             var screen = new ObservableCollection<DXTabItem>()
-            {
-                new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
-                new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
-                new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
-            };
+                {
+                    new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
+                    new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
+                    new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
+                };
 
             dXTabControl1.ItemsSource = screen;
         }

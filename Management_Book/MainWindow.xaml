@@ -9,8 +9,7 @@
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
     Title="MainWindow" 
     Height="800" Width="1000" 
-    WindowStartupLocation="CenterScreen"
-    Loaded="ThemedWindow_Loaded">
+    WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -39,7 +38,13 @@
 
             <!--region #DefaultPageCategory-->
             <dxr:RibbonDefaultPageCategory>
-                <dxr:RibbonPage Caption="Master data">
+                <dxr:RibbonPage Caption="Account">
+                    <dxr:RibbonPageGroup Caption="">
+                        <dxb:BarButtonItem Content="Logout" Glyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}" RibbonStyle="SmallWithText" Padding="0,8" Margin="0"/>
+                        <dxb:BarButtonItem Content="Change Pass" Glyph="{dx:DXImage SvgImages/Icon Builder/Security_Key.svg}" Padding="0,8"/>
+                    </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+                <dxr:RibbonPage Caption="Master data" Loaded="ThemedWindow_Loaded">
                     <dxr:RibbonPageGroup Caption="Import">
                         <dxb:BarButtonItem x:Name="import_btn" ItemClick="import_btn_ItemClick"  Content="Excel" LargeGlyph="{dx:DXImage SvgImages/Export/ExportToXLSX.svg}"/>
                     </dxr:RibbonPageGroup>
@@ -70,7 +75,7 @@
         </dxr:RibbonControl>
 
         <dx:DXTabControl Grid.Row="1"
-                         Name="dXTabControl1">
+                         Name="dXTabControl1" Loaded="ThemedWindow_Loaded">
             <dx:DXTabControl.ItemContainerStyle>
                 <Style TargetType="dx:DXTabItem">
                     <Setter Property="Header" Value="{Binding Header}" />
