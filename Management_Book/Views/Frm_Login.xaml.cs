@@ -27,79 +27,10 @@ namespace Management_Book.Views
         {
             InitializeComponent();
         }
-        class AppConfig
-        {
-            public static string Server = "Server";
-            public static string Instance = "Instance";
-            public static string Database = "Database";
-            public static string getValue(string key)
-            {
-                string value = (string)ConfigurationManager.AppSettings[key];
-                return value;
-            }
-            public static void setValue(string key, string value)
-            {
-                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                var settings = configFile.AppSettings.Settings;
-                settings[key].Value = value;
 
-                configFile.Save(ConfigurationSaveMode.Minimal);
-            }
-            public static string ConnectionString()
-            {
-                string result = "";
-
-                var builder = new SqlConnectionStringBuilder();
-                string server = AppConfig.getValue(AppConfig.Server);
-                string instance = AppConfig.getValue(AppConfig.Instance);
-                string database = AppConfig.getValue(AppConfig.Database);
-
-                //builder.DataSource = $"{server}\\{instance}";
-                builder.DataSource = $"{instance}";
-                builder.InitialCatalog = database;
-                builder.IntegratedSecurity = true;
-                builder.ConnectTimeout = 5;
-
-                result = builder.ToString();
-                return result;
-            }
-        }
-
-
-        class SqlDataAccess
-        {
-            private SqlConnection _connection;
-            public SqlDataAccess(string connectionString)
-            {
-                _connection = new SqlConnection(connectionString);
-            }
-
-            public bool CanConnect()
-            {
-                bool result = true;
-
-                try
-                {
-                    _connection.Open();
-                    _connection.Close();
-                }
-                catch (Exception ex)
-                {
-                    result = false;
-                    MessageBox.Show(ex.Message);
-                }
-
-                return result;
-            }
-
-            public void Connect()
-            {
-                _connection.Open();
-            }
-        }
         private void BtnOK_Click(object sender, RoutedEventArgs e)
         {
-            string connectionString = AppConfig.ConnectionString();
+            string connectionString = ConfigurationManager.ConnectionStrings["myDatabaseConnection"].ConnectionString;
             SqlConnection sqlCon = new SqlConnection(connectionString);
             try
             {
