@@ -97,7 +97,6 @@ namespace Management_Book.Model
             public int CurrentPage { get => _currentPage; set { _currentPage = value; OnPropertyChanged(); } }
             public int PageSize { get => _pageSize; set { _pageSize = value; OnPropertyChanged(); } }
             public int TotalPage { get => _totalPage; set { _totalPage = value; OnPropertyChanged(); } }
-            public int TotalItems { get => _totalItems; set { _totalItems = value; OnPropertyChanged(); } }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
