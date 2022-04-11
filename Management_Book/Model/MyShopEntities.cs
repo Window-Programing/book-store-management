@@ -212,10 +212,11 @@ namespace Management_Book.Model
                 string name = reader.GetString(1);
                 products.Add(new MyShopModel.Product()
                 {
-                    //Name = reader.GetString(1),
-                    //Price = reader.GetInt32(2),
-                    //Quantity = reader.GetInt32(3),
-                    //Image = reader.GetString(4),
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Price = reader.GetInt32(2),
+                    Quantity = reader.GetInt32(3),
+                    Image = reader.GetString(4),
                     //Category = new MyShopModel.Category() { Id = reader.GetInt32(5) }
                 });
             }

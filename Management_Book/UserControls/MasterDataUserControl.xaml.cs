@@ -39,7 +39,7 @@ namespace Management_Book.UserControls
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
 
-            DataGirdProduct.ItemsSource = _viewModel.SelectedProducts;
+            //DataGirdProduct.ItemsSource = _viewModel.SelectedProducts;
             _viewModel.PageSize = 10;
 
             MyShopEntities db = MyShopEntities.getInstance();
@@ -55,6 +55,8 @@ namespace Management_Book.UserControls
             db.closeConnection();
 
             ComboBoxCategory.ItemsSource = _categories;
+            grid.ItemsSource = _viewModel.SelectedProducts;
+            
         }
         private void ComboBoxCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -63,6 +65,11 @@ namespace Management_Book.UserControls
             {
                 _viewModel.Products = _categories[i].Products;
                 _viewModel.CurrentPage = 1;
+
+                foreach(var pro in _viewModel.Products)
+                {
+                    Debug.WriteLine(pro.Name);
+                }
 
                 transDataToView(_viewModel.Products, _viewModel.SelectedProducts);
                 updatePaging(_viewModel);
@@ -74,7 +81,6 @@ namespace Management_Book.UserControls
             _viewModel.CurrentPage = 1;
             updatePaging(_viewModel);
         }
-
         private void previousButton_Click(object sender, RoutedEventArgs e)
         {
             if (_viewModel.CurrentPage > 1)
@@ -83,7 +89,6 @@ namespace Management_Book.UserControls
                 updatePaging(_viewModel);
             }
         }
-
         private void nextButton_Click(object sender, RoutedEventArgs e)
         {
             if (_viewModel.CurrentPage < _viewModel.TotalPage)
@@ -92,13 +97,11 @@ namespace Management_Book.UserControls
                 updatePaging(_viewModel);
             }
         }
-
         private void lastButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CurrentPage = _viewModel.TotalPage;
             updatePaging(_viewModel);
         }
-
         private void transDataToView(List<MyShopModel.Product> source, BindingList<MyShopModel.Product> view)
         {
             if (view.Count != 0) view.Clear();

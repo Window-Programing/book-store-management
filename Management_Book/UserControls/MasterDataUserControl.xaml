@@ -1,30 +1,28 @@
-﻿<UserControl x:Class="Management_Book.UserControls.MasterDataUserControl"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Management_Book.UserControls"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid" x:Class="Management_Book.UserControls.MasterDataUserControl"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="800"
              Loaded="UserControl_Loaded">
     <Canvas>
         <TextBlock Text="Category" FontSize="14" Canvas.Left="19" Canvas.Top="11" HorizontalAlignment="Center" VerticalAlignment="Top" />
-        <ComboBox Name="ComboBoxCategory" SelectionChanged="ComboBoxCategory_SelectionChanged"  SelectedValue="0"
+        <ComboBox x:Name="ComboBoxCategory" SelectionChanged="ComboBoxCategory_SelectionChanged"  SelectedValue="0"
                   Width="200" Height="25" Canvas.Left="95" Canvas.Top="10" HorizontalAlignment="Center" VerticalAlignment="Top">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}"></TextBlock>
+                    <TextBlock Text="{Binding Name}"/>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <DataGrid Name="DataGirdProduct" Canvas.Left="20" Canvas.Top="55">
-            <DataGrid.Columns >
-                
-            </DataGrid.Columns>
-        </DataGrid>
+        <!--<DataGrid x:Name="DataGirdProduct" Canvas.Left="20" Canvas.Top="55"/>-->
 
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Canvas.Left="30" Canvas.Top="535" VerticalAlignment="Top">
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Canvas.Left="130" Canvas.Top="540" VerticalAlignment="Top">
             <Button x:Name="firstButton" Width="40" Height="35" Content="&lt;&lt;" Click="firstButton_Click"/>
             <Button x:Name="previousButton" Width="40" Height="35" Content="&lt;" Click="previousButton_Click"/>
             <ComboBox x:Name="currentPagingTextBlock" Width="120" SelectedValue="0">
@@ -42,5 +40,11 @@
             <Button x:Name="nextButton" Width="40" Height="35" Content="&gt;" Click="nextButton_Click"/>
             <Button x:Name="lastButton" Width="40" Height="35" Content="&gt;&gt;" Click="lastButton_Click"/>
         </StackPanel>
+        <dxg:GridControl Name="grid" AutoGenerateColumns="AddNew" EnableSmartColumnsGeneration="True" Height="465" Width="775" Canvas.Left="10" Canvas.Top="60" HorizontalAlignment="Left" VerticalAlignment="Center">
+            <dxg:GridControl.View>
+                <dxg:TableView/>
+            </dxg:GridControl.View>
+        </dxg:GridControl>
+
     </Canvas>
 </UserControl>
