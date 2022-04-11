@@ -132,14 +132,11 @@ namespace Management_Book.Views
             }
         }
 
-        private void SimpleButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void Btn_Regis(object sender, RoutedEventArgs e)
         {
-
+            Frm_Regis regis = new Frm_Regis();
+            regis.Show();
+            this.Close();
         }
     }
 }
