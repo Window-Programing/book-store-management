@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,21 +35,34 @@ namespace Management_Book.Views
             SqlConnection sqlCon = new SqlConnection(connectionString);
             try
             {
+
                 if (sqlCon.State == ConnectionState.Closed)
                     sqlCon.Open();
-                String query = "SELECT COUNT(1) FROM UserInformation WHERE Username=@Username AND Password=@Password";
+                String query = "SELECT * FROM UserInformation WHERE Username=@Username";
                 SqlCommand sqlCmd = new SqlCommand(query, sqlCon);
                 sqlCmd.CommandType = CommandType.Text;
                 sqlCmd.Parameters.AddWithValue("@Username", TxtUsername.Text);
-                sqlCmd.Parameters.AddWithValue("@Password", TxtPassword.Password);
-                int count = Convert.ToInt32(sqlCmd.ExecuteScalar());
-                if (count == 1)
+                SqlDataReader dr = sqlCmd.ExecuteReader();
+                string cypherText = "";
+                string entropyText = "";
+                if (dr.Read())
+                {
+                    cypherText = dr.GetString(2);
+                    entropyText = dr.GetString(3);
+                }
+
+                var cypherTextInBytes = Convert.FromBase64String(cypherText);
+                var entropyTextInBytes = Convert.FromBase64String(entropyText);
+                var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyTextInBytes, DataProtectionScope.CurrentUser);
+                string sourcePassword = Encoding.UTF8.GetString(passwordInBytes);
+
+                if (TxtPassword.Password == sourcePassword)
                 {
                     MainWindow dashboard = new MainWindow();
                     dashboard.Show();
                     this.Close();
                 }
-                else
+                else 
                 {
                     MessageBox.Show("Username or password is incorrect.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }

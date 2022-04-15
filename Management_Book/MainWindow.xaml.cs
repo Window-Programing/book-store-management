@@ -201,5 +201,12 @@ namespace Management_Book
 
             dXTabControl1.ItemsSource = screen;
         }
+
+        private void Button_Logout_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            Frm_Login mv = new Frm_Login();
+            mv.Show();
+            this.Close();
+        }
     }
 }
