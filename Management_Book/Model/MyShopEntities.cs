@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
-
+using System.Diagnostics;
 
 namespace Management_Book.Model
 {
@@ -39,7 +39,14 @@ namespace Management_Book.Model
             return Instance;
         }
 
-
+        enum PurchaseStatus
+        {
+            All = -1,
+            New = 1,
+            Cancelled = 2,
+            Completed = 3,
+            Shipping = 4
+        }
         public class CategoryTableField
         {
             static public string ID = "category_id";
@@ -50,6 +57,7 @@ namespace Management_Book.Model
             static public string ID = "product_id";
             static public string Name = "product_name";
             static public string Price = "price";
+            static public string Cost = "cost";
             static public string Quantity = "quantity";
             static public string Image = "image";
             static public string Category = "category";
@@ -75,56 +83,16 @@ namespace Management_Book.Model
             catch (Exception ex) { string message =  ex.Message; }
         }
 
-        public void truncateTable(string tableName)
+        public void resetTable(string tableName)
         {
             if(tableName == ProductTable || tableName == CategoryTable)
             {
-                var sql = $"TRUNCATE TABLE {tableName}";
+                var sql = $"DELETE {tableName}; DBCC CHECKIDENT('{tableName}', RESEED, 0)";
                 SqlCommand command = new SqlCommand(sql, connection);
                 command.Parameters.Add("@tableName", SqlDbType.NText).Value = tableName;
 
                 command.ExecuteNonQuery();
             }
-        }
-
-        public void insertProduct(MyShopModel.Product product)
-        {
-            var sql = $"INSERT INTO Product({ProductTableField.Name}, {ProductTableField.Price}, {ProductTableField.Quantity}, {ProductTableField.Image}, {ProductTableField.Category}) " +
-                $"VALUES(@name, @price, @quantity, @image, @category)";
-
-            SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@name", SqlDbType.NText).Value = product.Name;
-            command.Parameters.Add("@price", SqlDbType.Int).Value = product.Price;
-            command.Parameters.Add("@quantity", SqlDbType.Int).Value = product.Quantity;
-            command.Parameters.Add("@image", SqlDbType.Text).Value = product.Image;
-            command.Parameters.Add("@category", SqlDbType.Int).Value = product.Category.Id;
-
-            command.ExecuteNonQuery();
-        }
-        public void updateProduct(int productIDTarget, string name, int price, int quantity, string image, int category)
-        {
-            var sql = $"UPDATE Product SET {ProductTableField.Name}=@name, {ProductTableField.Price}= @price," +
-                $" {ProductTableField.Quantity} = @quantity, {ProductTableField.Image} = @image, {ProductTableField.Category}= @category" +
-                $"WHERE {ProductTableField.ID}=@id";
-
-            SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@id", SqlDbType.Int).Value = productIDTarget;
-            command.Parameters.Add("@name", SqlDbType.NText).Value = name;
-            command.Parameters.Add("@price", SqlDbType.Int).Value = price;
-            command.Parameters.Add("@quantity", SqlDbType.Int).Value = quantity;
-            command.Parameters.Add("@image", SqlDbType.Text).Value = image;
-            command.Parameters.Add("@category", SqlDbType.Int).Value = category;
-
-            command.ExecuteNonQuery();
-        }
-        public void deleteProduct(int id)
-        {
-            var sql = $"DELETE FROM Product WHERE {ProductTableField.ID}=@id;";
-
-            SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@id", SqlDbType.Int).Value = id;
-
-            command.ExecuteNonQuery();
         }
         public int insertCategory(MyShopModel.Category category)
         {
@@ -167,7 +135,9 @@ namespace Management_Book.Model
 
             while (reader.Read())
             {
-                categories.Add(new MyShopModel.Category() { Name = reader[CategoryTableField.Name].ToString() });
+                categories.Add(new MyShopModel.Category() { 
+                    Id = (int) reader[CategoryTableField.ID],
+                    Name = reader[CategoryTableField.Name].ToString() });
             }
 
             command.Cancel();
@@ -175,6 +145,48 @@ namespace Management_Book.Model
             return categories;
         }
 
+        public void insertProduct(MyShopModel.Product product)
+        {
+            var sql = $"INSERT INTO Product({ProductTableField.Name}, {ProductTableField.Price}, {ProductTableField.Cost}, {ProductTableField.Quantity}, {ProductTableField.Image}, {ProductTableField.Category}) " +
+                $"VALUES(@name, @price, @cost, @quantity, @image, @category)";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@name", product.Name);
+            command.Parameters.AddWithValue("@price", product.Price);
+            command.Parameters.AddWithValue("@cost", product.Cost);
+            command.Parameters.AddWithValue("@quantity", product.Quantity);
+            command.Parameters.AddWithValue("@image", product.Image);
+            command.Parameters.AddWithValue("@category", product.Category.Id);
+
+            command.ExecuteNonQuery();
+        }
+        public void updateProduct(MyShopModel.Product product)
+        {
+            var sql = $"UPDATE Product SET {ProductTableField.Name}=@name, {ProductTableField.Price}= @price, " +
+                $"{ProductTableField.Cost} = @cost, {ProductTableField.Quantity} = @quantity, " +
+                $"{ProductTableField.Image} = @image, {ProductTableField.Category} = @category " +
+                $"WHERE {ProductTableField.ID} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", product.Id);
+            command.Parameters.AddWithValue("@name", product.Name);
+            command.Parameters.AddWithValue("@price", product.Price);
+            command.Parameters.AddWithValue("@cost", product.Cost);
+            command.Parameters.AddWithValue("@quantity", product.Quantity);
+            command.Parameters.AddWithValue("@image", product.Image);
+            command.Parameters.AddWithValue("@category", product.Category.Id);
+
+            command.ExecuteNonQuery();
+        }
+        public void deleteProduct(int id)
+        {
+            var sql = $"DELETE FROM Product WHERE {ProductTableField.ID}=@id;";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.Add("@id", SqlDbType.Int).Value = id;
+
+            command.ExecuteNonQuery();
+        }
         public List<MyShopModel.Product> getAllProducts()
         {
             var sql = $"SELECT * FROM Product";
@@ -187,41 +199,119 @@ namespace Management_Book.Model
             while (reader.Read())
             {
                 products.Add(new MyShopModel.Product() {
+                    Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = reader.GetInt32(2),
-                    Quantity = reader.GetInt32(3),
-                    Image = reader.GetString(4),
-                    Category = new MyShopModel.Category() { Id = reader.GetInt32(5) }
+                    Price = (float)reader.GetDouble(2),
+                    Cost = (float)reader.GetDouble(3),
+                    Quantity = reader.GetInt32(4),
+                    Image = reader.GetString(5),
+                    Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
+                });
+            }
+
+            return products;
+        }
+        public List<MyShopModel.Product> getProducts(int categoryId, string name)
+        {
+            var sql = $"SELECT * FROM Product WHERE {ProductTableField.Category} = @category AND {ProductTableField.Name} LIKE @name";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@category", categoryId);
+            command.Parameters.AddWithValue("@name", name + "%");
+            var reader = command.ExecuteReader();
+
+            Debug.WriteLine(command.CommandText.ToString());
+
+            var products = new List<MyShopModel.Product>();
+
+            while (reader.Read())
+            {
+                products.Add(new MyShopModel.Product()
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Price = (float)reader.GetDouble(2),
+                    Cost = (float)reader.GetDouble(3),
+                    Quantity = reader.GetInt32(4),
+                    Image = reader.GetString(5),
+                    Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
                 });
             }
 
             return products;
         }
 
-        public List<MyShopModel.Product> getProductsOf(string categoryName)
+        public List<MyShopModel.Product> getProductsOf(int categoryId)
         {
-            var sql = $"SELECT * FROM Product JOIN Category on Product.category = Category.category_id WHERE Category.category_name LIKE @name";
+            var sql = $"SELECT * FROM Product WHERE {ProductTableField.Category} = @id";
 
             SqlCommand command = new SqlCommand(sql, connection);
-            command.Parameters.Add("@name", SqlDbType.NText).Value = categoryName;
+            command.Parameters.AddWithValue("@id", categoryId);
             var reader = command.ExecuteReader();
 
             var products = new List<MyShopModel.Product>();
 
             while (reader.Read())
             {
-                string name = reader.GetString(1);
                 products.Add(new MyShopModel.Product()
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = reader.GetInt32(2),
-                    Quantity = reader.GetInt32(3),
-                    Image = reader.GetString(4),
-                    //Category = new MyShopModel.Category() { Id = reader.GetInt32(5) }
+                    Price = (float)reader.GetDouble(2),
+                    Cost = (float)reader.GetDouble(3),
+                    Quantity = reader.GetInt32(4),
+                    Image = reader.GetString(5),
+                    Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
                 });
             }
             command.Cancel();
+
+            return products;
+        }
+
+        public void deleteProductsOf(int categoryId)
+        {
+            var sql = $"DELETE FROM Product WHERE {ProductTableField.Category} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", categoryId);
+            command.ExecuteNonQuery();
+            command.Cancel();
+
+        }
+
+        internal List<MyShopModel.Product> getProductsFilterByPrice(string name, int categoryId, int fromPrice, int toPrice)
+        {
+            var sql =$"SELECT * " +
+                $"FROM Product " +
+                $"WHERE {ProductTableField.Category} = @category AND {ProductTableField.Name} LIKE @name and " +
+                $"{ProductTableField.Price} >= @fromPrice and {ProductTableField.Price} <= @toPrice " +
+                $"ORDER BY price ASC";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@category", categoryId);
+            command.Parameters.AddWithValue("@name", name + "%");
+            command.Parameters.AddWithValue("@fromPrice", fromPrice);
+            command.Parameters.AddWithValue("@toPrice", toPrice);
+            var reader = command.ExecuteReader();
+
+            Debug.WriteLine(command.CommandText.ToString());
+
+            var products = new List<MyShopModel.Product>();
+
+            while (reader.Read())
+            {
+                products.Add(new MyShopModel.Product()
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Price = (float)reader.GetDouble(2),
+                    Cost = (float)reader.GetDouble(3),
+                    Quantity = reader.GetInt32(4),
+                    Image = reader.GetString(5),
+                    Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
+                });
+            }
 
             return products;
         }

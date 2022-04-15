@@ -1,4 +1,6 @@
 ﻿using Aspose.Cells;
+using DevExpress.Mvvm.UI.Native;
+using DevExpress.Xpf.Core;
 using Management_Book.Model;
 using Microsoft.Win32;
 using System;
@@ -28,8 +30,22 @@ namespace Management_Book.UserControls
     /// </summary>
     public partial class MasterDataUserControl : UserControl
     {
+        public enum MasterDataAction
+        {
+            AddNewCategory,               
+            DeleteSelectedCategory,  
+            AddNewProduct,	
+            UpdateSelectedProduct, 
+            DeleteSelectedProduct
+        };
+
         MyShopModel.ViewModel _viewModel = new MyShopModel.ViewModel();
         BindingList<MyShopModel.Category> _categories;
+
+        Dictionary<string, int> categoriesDictionary = new Dictionary<string, int>();
+
+        MyShopModel.Category selectedCategory = new MyShopModel.Category();
+
         class PagingRow
         {
             public int Page { get; set; }
@@ -57,28 +73,40 @@ namespace Management_Book.UserControls
         {
             InitializeComponent();
         }
-
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            _viewModel.PageSize = 14;
+            updateDataSource();
+        }
 
-            //DataGirdProduct.ItemsSource = _viewModel.SelectedProducts;
-            _viewModel.PageSize = 10;
-
+        public void updateDataSource()
+        {
             MyShopEntities db = MyShopEntities.getInstance();
             db.openConnection();
-            _categories = new BindingList<MyShopModel.Category>(db.getCategories());
-            db.closeConnection();
 
-            db.openConnection();
+            _categories = new BindingList<MyShopModel.Category>(db.getCategories());
+            foreach (var category in _categories)
+            {
+                categoriesDictionary[category.Name] = category.Id;
+            }
+
             foreach (var cat in _categories)
             {
-                cat.Products = db.getProductsOf(cat.Name);
+                cat.Products = db.getProductsOf(cat.Id);
             }
             db.closeConnection();
 
             ComboBoxCategory.ItemsSource = _categories;
-            grid.ItemsSource = _viewModel.SelectedProducts;
-            
+            if (ComboBoxCategory.Items.Count > 0)
+            {
+                ComboBoxCategory.SelectedIndex = 0;
+                selectedCategory = ComboBoxCategory.SelectedItem as MyShopModel.Category;
+                GridData.ItemsSource = _viewModel.SelectedProducts;
+            }
+            else
+            {
+                GridData.ItemsSource = new BindingList<MyShopModel.Product>();
+            }
         }
         private void ComboBoxCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -90,19 +118,20 @@ namespace Management_Book.UserControls
                 _viewModel.TotalPage = _viewModel.Products.Count / _viewModel.PageSize +
                     (_viewModel.Products.Count % _viewModel.PageSize == 0 ? 0 : 1);
 
-                transDataToView(_viewModel.Products, _viewModel.SelectedProducts);
-                updatePaging(_viewModel);
+                updateView();
 
                 currentPagingComboBox.ItemsSource = new PagingInfo(_viewModel.TotalPage).Items;
                 currentPagingComboBox.SelectedIndex = 0;
             }
+
+            selectedCategory = ComboBoxCategory.SelectedItem as MyShopModel.Category;
         }
 
         private void firstButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CurrentPage = 1;
             currentPagingComboBox.SelectedIndex = 0;
-            updatePaging(_viewModel);
+            updateView();
         }
         private void previousButton_Click(object sender, RoutedEventArgs e)
         {
@@ -110,7 +139,7 @@ namespace Management_Book.UserControls
             {
                 _viewModel.CurrentPage -= 1;
                 currentPagingComboBox.SelectedIndex -= 1;
-                updatePaging(_viewModel);
+                updateView();
             }
         }
         private void nextButton_Click(object sender, RoutedEventArgs e)
@@ -119,29 +148,15 @@ namespace Management_Book.UserControls
             {
                 _viewModel.CurrentPage += 1;
                 currentPagingComboBox.SelectedIndex += 1;
-                updatePaging(_viewModel);
+                updateView();
             }
         }
         private void lastButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CurrentPage = _viewModel.TotalPage;
             currentPagingComboBox.SelectedIndex = _viewModel.TotalPage - 1;
-            updatePaging(_viewModel);
+            updateView();
         }
-        private void transDataToView(List<MyShopModel.Product> source, BindingList<MyShopModel.Product> view)
-        {
-            if (view.Count != 0) view.Clear();
-            foreach (var product in source) view.Add(product);
-        }
-        private void updatePaging(MyShopModel.ViewModel view)
-        {
-            transDataToView(view.Products
-                                .Skip((view.CurrentPage - 1) * view.PageSize)
-                                .Take(view.PageSize)
-                                .ToList(),
-                            _viewModel.SelectedProducts);
-        }
-
         private void currentPagingComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var next = currentPagingComboBox.SelectedItem as PagingRow;
@@ -149,10 +164,194 @@ namespace Management_Book.UserControls
             if(next != null)
             {
                 _viewModel.CurrentPage = (int)next.Page;
-                updatePaging(_viewModel);
             }
-            
+        }
+        public void HandleParentEvent(MasterDataAction action)
+        {
+            MyShopModel.Product productChoose = new MyShopModel.Product();
+            if (GridData.SelectedItem != null)
+            {
+                productChoose = GridData.SelectedItem as MyShopModel.Product;
+            }
 
+            MyShopEntities.getInstance().openConnection();
+
+            switch (action)
+            {
+                case MasterDataAction.AddNewCategory:
+                    addNewCategory();
+                    break;
+                case MasterDataAction.DeleteSelectedCategory:
+                    deleteSelectedCategory();
+                    break;
+                case MasterDataAction.AddNewProduct:
+                    AddNewProduct();
+                    break;
+                case MasterDataAction.UpdateSelectedProduct:
+                    int id_category = ComboBoxCategory.SelectedIndex;
+
+                    productChoose.Name = TextBox_Name.Text;
+                    productChoose.Price = (float)Convert.ToDouble(TextBox_Price.Text);
+                    productChoose.Cost = (float)Convert.ToDouble(TextBox_Cost.Text);
+                    productChoose.Quantity = Convert.ToInt32(TextBox_Quantity.Text);
+                    productChoose.Image = TextBox_Image.Text;
+                    productChoose.Category = new MyShopModel.Category() { Id = categoriesDictionary[_categories[id_category].Name] };
+
+                    UpdateSelectedProduct(productChoose);
+                    break;
+                case MasterDataAction.DeleteSelectedProduct:
+                    
+                    DeleteSelectedProduct(productChoose.Id);
+                    break;
+            }
+
+            MyShopEntities.getInstance().closeConnection();
+        }
+        private void deleteSelectedCategory()
+        {
+            Debug.WriteLine("Delete Category Event Click");
+
+            MyShopEntities.getInstance().deleteProductsOf(selectedCategory.Id);
+            MyShopEntities.getInstance().deleteCategory(selectedCategory.Id);
+           
+            updateDataSource();
+        }
+        private void addNewCategory()
+        {
+            Debug.WriteLine("Add Category Event Click");
+
+            Application curApp = Application.Current;
+            Window window = curApp.MainWindow;
+
+            InputNewCategory inputNewCategory = new InputNewCategory();
+            inputNewCategory.Owner = window;
+            inputNewCategory.ShowDialog();
+
+            MyShopModel.Category newCategory = inputNewCategory.getNewCategory();
+            if (inputNewCategory.DialogResult == true && newCategory != null)
+            {
+                MyShopEntities.getInstance().insertCategory(newCategory);
+                _categories.Add(newCategory);
+            }
+        }
+        private void AddNewProduct()
+        {
+            Debug.WriteLine("Add Product Event Click");
+
+            Application curApp = Application.Current;
+            Window window = curApp.MainWindow;
+
+            InputNewProduct inputNewProduct = new InputNewProduct();
+            inputNewProduct.Owner = window;
+            inputNewProduct.ShowDialog();
+
+            MyShopModel.Product newProduct = inputNewProduct.getNewProduct();
+
+            if (inputNewProduct.DialogResult == true && newProduct != null)
+            {
+                MyShopEntities.getInstance().openConnection();
+                MyShopEntities.getInstance().insertProduct(newProduct);
+            }
+
+            updateDataChangedFromDatabase();
+        }
+        private void UpdateSelectedProduct(MyShopModel.Product targetProduct)
+        {
+            Debug.WriteLine("Update Product Event Click");
+
+            foreach (var product in _viewModel.SelectedProducts)
+            {
+                if (product.Id == targetProduct.Id)
+                {
+                    MyShopEntities.getInstance().updateProduct(targetProduct);   
+                }
+            }
+            updateDataChangedFromDatabase();
+        }
+        private void DeleteSelectedProduct(int id)
+        {
+            Debug.WriteLine("Delete Product Event Click");
+            
+            for (var i = 0; i < _viewModel.SelectedProducts.Count; i++)
+            {
+                if (_viewModel.SelectedProducts[i].Id == id)
+                {
+                    _viewModel.SelectedProducts.RemoveAt(i);
+                    MyShopEntities.getInstance().deleteProduct(id);
+
+                   
+                }
+            }
+            updateDataChangedFromDatabase();
+        }
+        private void transDataToView(List<MyShopModel.Product> source, BindingList<MyShopModel.Product> view)
+        {
+            if (view.Count != 0) view.Clear();
+            foreach (var product in source) view.Add(product);
+        }
+        private void updateView()
+        {
+            int oldTotalPage = _viewModel.TotalPage;
+            _viewModel.TotalPage = _viewModel.Products.Count / _viewModel.PageSize +
+                (_viewModel.Products.Count % _viewModel.PageSize == 0 ? 0 : 1);
+
+            if (_viewModel.TotalPage != oldTotalPage)
+            {
+                currentPagingComboBox.ItemsSource = new PagingInfo(_viewModel.TotalPage).Items;
+
+                if (_viewModel.CurrentPage > _viewModel.TotalPage)
+                {
+                    _viewModel.CurrentPage = currentPagingComboBox.Items.Count - 1;
+                }
+
+                
+                if(_viewModel.CurrentPage < 1)
+                {
+                    currentPagingComboBox.SelectedIndex = 0;
+                } else
+                {
+                    currentPagingComboBox.SelectedIndex = _viewModel.CurrentPage - 1;
+                }
+
+            }
+
+            transDataToView(_viewModel.Products
+                                .Skip((_viewModel.CurrentPage - 1) * _viewModel.PageSize)
+                                .Take(_viewModel.PageSize)
+                                .ToList(),
+                            _viewModel.SelectedProducts);
+        }
+        private void updateDataChangedFromDatabase()
+        {
+            _viewModel.Products = MyShopEntities.getInstance().getProductsOf(selectedCategory.Id);
+            updateView();
+        }
+        private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            string searchText = SearchInput.Text.ToString().Trim();
+            MyShopEntities.getInstance().openConnection();
+            _viewModel.Products = MyShopEntities.getInstance().getProducts(selectedCategory.Id, searchText);
+            MyShopEntities.getInstance().closeConnection();
+            updateView();
+        }
+        private void filterPrice_Click(object sender, RoutedEventArgs e)
+        {
+            string searchText = SearchInput.Text.ToString().ToLower().Trim();
+            MyShopEntities.getInstance().openConnection();
+            int from = Convert.ToInt32(fromPrice.Text);
+            int to = Convert.ToInt32(toPrice.Text);
+            _viewModel.Products = MyShopEntities.getInstance()
+               .getProductsFilterByPrice(searchText, selectedCategory.Id, from, to);
+
+            MyShopEntities.getInstance().closeConnection();
+            updateView();
+        }
+        private void refreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            MyShopEntities.getInstance().openConnection();
+            _viewModel.Products = MyShopEntities.getInstance().getProductsOf(selectedCategory.Id);
+            MyShopEntities.getInstance().closeConnection();
+            updateView();
         }
     }
 }

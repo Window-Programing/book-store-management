@@ -28,6 +28,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
 
 namespace Management_Book
 {
@@ -54,7 +55,6 @@ namespace Management_Book
             {
                 try
                 {
-
                     var filename = screen.FileName;
                     var workbook = new Workbook(filename);
 
@@ -66,8 +66,8 @@ namespace Management_Book
 
                     MyShopEntities db = MyShopEntities.getInstance();
                     db.openConnection();
-                    db.truncateTable(MyShopEntities.ProductTable);
-                    db.truncateTable(MyShopEntities.CategoryTable);
+                    db.resetTable(MyShopEntities.ProductTable);
+                    db.resetTable(MyShopEntities.CategoryTable);
 
                     var row = 2;
                     var cell = categorySheet.Cells[$"B{row}"];
@@ -93,14 +93,16 @@ namespace Management_Book
                     {
                         string categoryName = cell.StringValue;
                         string name = productSheet.Cells[$"C{row}"].StringValue;
-                        int price = productSheet.Cells[$"D{row}"].IntValue;
-                        int quantity = productSheet.Cells[$"E{row}"].IntValue;
-                        string image = productSheet.Cells[$"F{row}"].StringValue;
+                        float price = productSheet.Cells[$"D{row}"].FloatValue;
+                        float cost = productSheet.Cells[$"E{row}"].FloatValue;
+                        int quantity = productSheet.Cells[$"F{row}"].IntValue;
+                        string image = productSheet.Cells[$"G{row}"].StringValue;
 
                         var product = new MyShopModel.Product()
                         {
                             Name = name,
                             Price = price,
+                            Cost = cost,
                             Quantity = quantity,
                             Image = image,
                             Category = new MyShopModel.Category() { Id = categoriesDictionary[categoryName], Name = categoryName }
@@ -120,29 +122,64 @@ namespace Management_Book
                     MessageBox.Show($"Không thể định dạng dữ liệu hoặc file không tồn tại", "Thất bại", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
+
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.updateDataSource();
         }
 
         private void add_category_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Add Category Button Clicked");
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.HandleParentEvent(MasterDataUserControl.MasterDataAction.AddNewCategory);
         }
 
         private void delete_category_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Update Category Button Clicked");
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.HandleParentEvent(MasterDataUserControl.MasterDataAction.DeleteSelectedCategory);
         }
 
         private void add_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Add Product Button Clicked");
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.HandleParentEvent(MasterDataUserControl.MasterDataAction.AddNewProduct);
         }
 
         private void update_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
+            Debug.WriteLine("Update Product Button Clicked");
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.HandleParentEvent(MasterDataUserControl.MasterDataAction.UpdateSelectedProduct);
 
         }
 
         private void delete_product_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            Debug.WriteLine("Delete Product Button Clicked");
+            var tab = dXTabControl1.Items[0] as DXTabItem;
+            var usercontrol = tab.Content as MasterDataUserControl;
+            usercontrol.HandleParentEvent(MasterDataUserControl.MasterDataAction.DeleteSelectedProduct);
+        }
+
+        private void Create_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void Update_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+
+        }
+
+        private void Delete_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
 
         }
@@ -158,8 +195,8 @@ namespace Management_Book
             var screen = new ObservableCollection<DXTabItem>()
                 {
                     new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
-                    new DXTabItem{Content = new SaleUserControl(), Header = "Sale"},
-                    new DXTabItem{Content = new OrderUserControl(), Header = "Order"}
+                    new DXTabItem{Content = new PurchaseUserControl(), Header = "Sale"},
+                    new DXTabItem{Content = new ReportUserControl(), Header = "Report"}
                 };
 
             dXTabControl1.ItemsSource = screen;

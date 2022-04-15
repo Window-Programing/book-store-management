@@ -61,6 +61,11 @@
                 </dxr:RibbonPage>
 
                 <dxr:RibbonPage Caption="Sale">
+                    <dxr:RibbonPageGroup Caption="Order">
+                        <dxb:BarButtonItem x:Name="Create_Order_Btn" ItemClick="Create_Order_Btn_ItemClick" Content="Create" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/NewOrder.svg}"/>
+                        <dxb:BarButtonItem x:Name="Update_Order_Btn" ItemClick="Update_Order_Btn_ItemClick" Content="Update" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/Task.svg}"/>
+                        <dxb:BarButtonItem x:Name="Delete_Order_Btn" ItemClick="Delete_Order_Btn_ItemClick" Content="Remove" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}"/>
+                    </dxr:RibbonPageGroup>
 
                 </dxr:RibbonPage>
 
