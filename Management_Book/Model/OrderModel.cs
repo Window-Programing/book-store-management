@@ -37,19 +37,19 @@ namespace Management_Book.Model
         public class Purchase : INotifyPropertyChanged
         {
             private int _id;
-            private int _purchaseDetailId;
             private int _customerlId;
             private float _total;
-            private string _createDate;
+            private DateTime _createDate;
             private string _customerTel;
             private int _status;
+            private string _statusDisplayText;
             public int Id { get => _id; set{_id = value;OnPropertyChanged();} }
             public int CustomerId { get => _customerlId; set { _customerlId = value; OnPropertyChanged(); } }
-            public int PurchaseId { get => _purchaseDetailId; set { _purchaseDetailId = value; OnPropertyChanged(); } }
             public float Total { get => _total; set { _total = value; OnPropertyChanged(); } }
             public string CustomerTel { get => _customerTel; set { _customerTel = value; OnPropertyChanged(); } }
             public int Status { get => _status; set { _status = value; OnPropertyChanged(); } }
-            public string CreateDate { get => _createDate; set { _createDate = value; OnPropertyChanged(); } }
+            public string StatusDisplayText { get => _statusDisplayText; set { _statusDisplayText = value; OnPropertyChanged(); } }
+            public DateTime CreateDate { get => _createDate; set { _createDate = value; OnPropertyChanged(); } }
 
             public event PropertyChangedEventHandler PropertyChanged;
 
@@ -60,6 +60,14 @@ namespace Management_Book.Model
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
                 }
             }
+        }
+
+        public class PurchaseStatusEnum
+        {
+            public string Key { get; set; }
+            public int Value { get; set; }
+            public string Description { get; set; }
+            public string DisplayText { get; set; }
         }
 
         public class PurchaseProduct : INotifyPropertyChanged
@@ -110,7 +118,7 @@ namespace Management_Book.Model
         public class ViewModel : INotifyPropertyChanged
         {
             int _currentPage = 0, _pageSize = 0, _totalPage = 0, _totalItems = 0;
-            public List<Purchase> Order { get; set; } = new List<Purchase>();
+            public List<Purchase> Orders { get; set; } = new List<Purchase>();
             public BindingList<Purchase> SelectedOrders { get; set; } = new BindingList<Purchase>();
             
             public int CurrentPage { get => _currentPage; set { _currentPage = value; OnPropertyChanged(); } }
