@@ -164,6 +164,7 @@ namespace Management_Book.UserControls
             if(next != null)
             {
                 _viewModel.CurrentPage = (int)next.Page;
+                updateView();
             }
         }
         public void HandleParentEvent(MasterDataAction action)
@@ -330,7 +331,7 @@ namespace Management_Book.UserControls
         {
             string searchText = SearchInput.Text.ToString().Trim();
             MyShopEntities.getInstance().openConnection();
-            _viewModel.Products = MyShopEntities.getInstance().getProducts(selectedCategory.Id, searchText);
+            _viewModel.Products = MyShopEntities.getInstance().getProductsLike(selectedCategory.Id, searchText);
             MyShopEntities.getInstance().closeConnection();
             updateView();
         }
