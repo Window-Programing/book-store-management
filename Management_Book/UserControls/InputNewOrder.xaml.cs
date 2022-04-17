@@ -389,15 +389,34 @@ namespace Management_Book.UserControls
 
             foreach (var purchaseProduct in _selectedProduct)
             {
-                OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
+                int quantity = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity - purchaseProduct.Quantity;
+                if(quantity >= 0)
                 {
-                    PurchaseId = newPurchaseId,
-                    ProductId = purchaseProduct.ProductId,
-                    Price = purchaseProduct.Price,
-                    Quantity = purchaseProduct.Quantity,
-                    Total = purchaseProduct.Total
-                };
-                OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
+                    OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
+                    {
+                        PurchaseId = newPurchaseId,
+                        ProductId = purchaseProduct.ProductId,
+                        Price = purchaseProduct.Price,
+                        Quantity = purchaseProduct.Quantity,
+                        Total = purchaseProduct.Total
+                    };
+                    OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
+                    MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, quantity);
+                } else
+                {
+                    OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
+                    {
+                        PurchaseId = newPurchaseId,
+                        ProductId = purchaseProduct.ProductId,
+                        Price = purchaseProduct.Price,
+                        Quantity = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity,
+                        Total = purchaseProduct.Total
+                    };
+                    OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
+                    MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, 
+                        MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity);
+                }
+                
             }
 
             MyShopEntities.getInstance().closeConnection();

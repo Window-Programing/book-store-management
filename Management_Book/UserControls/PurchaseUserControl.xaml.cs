@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,11 +63,16 @@ namespace Management_Book.UserControls
         List<OrderModel.PurchaseStatusEnum> statusEnum = new List<OrderModel.PurchaseStatusEnum>();
         List<OrderModel.PurchaseProduct> _listOrderProduct = new List<OrderModel.PurchaseProduct>();
 
+        OrderModel.Purchase selectedPurchaseRow = new OrderModel.Purchase();
+        int selectedRowOrderId = -1;
+
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             OrderEntities.getInstance().openConnection();
             statusEnum = OrderEntities.getInstance().getAllStatusEnum();
             OrderEntities.getInstance().closeConnection();
+
+            ComboBoxStatusFilter.ItemsSource = statusEnum;
 
             _viewModel.PageSize = 24;
             _viewModel.CurrentPage = 1;
@@ -182,16 +188,28 @@ namespace Management_Book.UserControls
                             _viewModel.SelectedOrders);
         }
 
+        private void updateDataChangedFromDatabase()
+        {
+            OrderEntities.getInstance().openConnection();
+
+            _viewModel.Orders = OrderEntities.getInstance().getAllPurchase();
+
+            foreach (var order in _viewModel.Orders)
+            {
+                OrderModel.Customer customer = OrderEntities.getInstance().getCustomerById(order.CustomerId);
+                order.CustomerTel = customer.Tel;
+                order.StatusDisplayText = statusEnum[statusEnum.FindIndex(stat => stat.Value == order.Status)].DisplayText;
+            }
+
+            GridData.ItemsSource = _viewModel.SelectedOrders;
+
+            OrderEntities.getInstance().closeConnection();
+
+            updateView();
+        }
+
         public void HandleParentEvent(PurchaseAction action)
         {
-        //    MyShopModel.Product productChoose = new MyShopModel.Product();
-        //    if (GridData.SelectedItem != null)
-        //    {
-        //        productChoose = GridData.SelectedItem as MyShopModel.Product;
-        //    }
-
-        //    MyShopEntities.getInstance().openConnection();
-
             switch (action)
             {
                 case PurchaseAction.AddNewOrder:
@@ -203,19 +221,89 @@ namespace Management_Book.UserControls
                 case PurchaseAction.DeleteSelectedOrder:
                     deleteSelectedOrder();
                     break;
-                
             }
-
         }
 
         private void deleteSelectedOrder()
         {
-            throw new NotImplementedException();
+            if (selectedPurchaseRow != null && GridData.SelectedIndex != -1)
+            {
+                if (MessageBox.Show("Bạn có muốn xóa đơn hàng này không ?", "Information", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    OrderEntities.getInstance().openConnection();
+
+                    OrderEntities.getInstance().deleteProductPurchaseDetail(selectedPurchaseRow.Id);
+
+                    OrderEntities.getInstance().deletePurchase(selectedPurchaseRow.Id);
+
+                    OrderEntities.getInstance().closeConnection();
+
+                    updateDataChangedFromDatabase();
+
+                    for (int i = 0; i < GridData.Items.Count; i++)
+                    {
+                        OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
+
+                        if (row != null && row.Id == selectedRowOrderId)
+                        {
+                            GridData.SelectedIndex = i;
+                        }
+                    }
+
+                    MessageBox.Show("Xóa đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn đơn hàng cần xóa", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void udpateSelectedOrder()
         {
-            throw new NotImplementedException();
+            OrderModel.PurchaseStatusEnum statusItem = ComboBox_Status.SelectedItem as OrderModel.PurchaseStatusEnum;
+
+            if (selectedPurchaseRow != null && GridData.SelectedIndex != -1)
+            {
+                OrderEntities.getInstance().openConnection();
+
+                selectedPurchaseRow.CreateDate = Convert.ToDateTime(TextBox_CreateDate.Text);
+                selectedPurchaseRow.Status = statusItem.Value;
+
+                double total;
+                double.TryParse(TextBox_Total.Text, NumberStyles.Currency, CultureInfo.GetCultureInfo("vi-VN").NumberFormat, out total);
+                selectedPurchaseRow.Total = total;
+
+                OrderEntities.getInstance().updatePurchase(selectedPurchaseRow);
+
+                OrderEntities.getInstance().updateCustomer(new OrderModel.Customer()
+                {
+                    Name = TextBox_CustomerName.Text,
+                    Email = TextBox_Email.Text,
+                    Address = TextBox_Address.Text,
+                    Tel = TextBox_Tel.Text
+                });
+
+                OrderEntities.getInstance().closeConnection();
+
+                updateDataChangedFromDatabase();
+
+                for (int i = 0; i < GridData.Items.Count; i++)
+                {
+                    OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
+
+                    if (row != null && row.Id == selectedRowOrderId)
+                    {
+                        GridData.SelectedIndex = i;
+                    }
+                }
+
+                MessageBox.Show("Cập nhật đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn đơn hàng cần cập nhật", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void addNewOrder()
@@ -230,11 +318,6 @@ namespace Management_Book.UserControls
             inputNewOrder.ShowDialog();
         }
 
-        private void ComboBoxCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
         private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
         {
 
@@ -242,24 +325,60 @@ namespace Management_Book.UserControls
 
         private void refreshButton_Click(object sender, RoutedEventArgs e)
         {
+            OrderEntities.getInstance().openConnection();
 
+            _viewModel.Orders = OrderEntities.getInstance().getAllPurchase();
+            foreach (var order in _viewModel.Orders)
+            {
+                OrderModel.Customer customer = OrderEntities.getInstance().getCustomerById(order.CustomerId);
+                order.CustomerTel = customer.Tel;
+                order.StatusDisplayText = statusEnum[statusEnum.FindIndex(stat => stat.Value == order.Status)].DisplayText;
+            }
+
+            OrderEntities.getInstance().closeConnection();
+
+            ComboBoxStatusFilter.SelectedIndex = -1;
+
+            updateView();
         }
 
         private void filterPrice_Click(object sender, RoutedEventArgs e)
         {
+            DateTime dateFrom = (DateTime)DatePickerFrom.SelectedDate;
+            dateFrom = dateFrom.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
+            DateTime dateTo = (DateTime)DatePickerTo.SelectedDate;
+            dateTo = dateTo.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
+            Debug.WriteLine(dateFrom);
+            Debug.WriteLine(dateTo);
+
+            OrderEntities.getInstance().openConnection();
+
+            _viewModel.Orders = OrderEntities.getInstance().getPurchasesFilterByDate(dateFrom, dateTo);
+            foreach (var order in _viewModel.Orders)
+            {
+                OrderModel.Customer customer = OrderEntities.getInstance().getCustomerById(order.CustomerId);
+                order.CustomerTel = customer.Tel;
+                order.StatusDisplayText = statusEnum[statusEnum.FindIndex(stat => stat.Value == order.Status)].DisplayText;
+            }
+
+            OrderEntities.getInstance().closeConnection();
+
+            updateView();
         }
 
         private void GridData_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
         {
-            OrderModel.Purchase orderRow = GridData.SelectedItem as OrderModel.Purchase;
-            if(orderRow != null) {
+            selectedPurchaseRow = GridData.SelectedItem as OrderModel.Purchase;
+            
+            if (selectedPurchaseRow != null) {
+                selectedRowOrderId = selectedPurchaseRow.Id;
                 OrderEntities.getInstance().openConnection();
 
-                _listOrderProduct = OrderEntities.getInstance().getPurchaseProductOf(orderRow.Id);
+                _listOrderProduct = OrderEntities.getInstance().getPurchaseProductOf(selectedPurchaseRow.Id);
                 GridListProduct.ItemsSource = _listOrderProduct;
 
-                OrderModel.Customer customer = OrderEntities.getInstance().getCustomerByTel(orderRow.CustomerTel);
+                OrderModel.Customer customer = OrderEntities.getInstance().getCustomerByTel(selectedPurchaseRow.CustomerTel);
 
                 TextBox_CustomerName.Text = customer.Name;
                 TextBox_Address.Text = customer.Address;
@@ -267,8 +386,60 @@ namespace Management_Book.UserControls
                 TextBox_Email.Text = customer.Email;
 
                 OrderEntities.getInstance().closeConnection();
+
+                ComboBox_Status.ItemsSource = statusEnum;
+                ComboBox_Status.SelectedIndex = statusEnum.FindIndex(stat => stat.Value.Equals(selectedPurchaseRow.Status));
             }
-           
+        }
+
+        private void Update_Status_Click(object sender, RoutedEventArgs e)
+        {
+            OrderModel.PurchaseStatusEnum statusItem = ComboBox_Status.SelectedItem as OrderModel.PurchaseStatusEnum;
+            if (selectedPurchaseRow != null)
+            {
+                OrderEntities.getInstance().openConnection();
+
+                OrderEntities.getInstance().updatePurchaseStatus(selectedPurchaseRow.Id, statusItem.Value);
+
+                OrderEntities.getInstance().closeConnection();
+
+                updateDataChangedFromDatabase();
+
+                for (int i = 0; i < GridData.Items.Count; i++)
+                {
+                    OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
+                   
+                    if (row != null && row.Id == selectedRowOrderId)
+                    {
+                        GridData.SelectedIndex = i;
+                    }
+                }
+
+                MessageBox.Show("Cập nhật trạng thái đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            }
+        }
+
+        private void ComboBoxStatus_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            OrderModel.PurchaseStatusEnum statusValue = ComboBoxStatusFilter.SelectedItem as OrderModel.PurchaseStatusEnum;
+            if(statusValue != null)
+            {
+                OrderEntities.getInstance().openConnection();
+
+                _viewModel.Orders = OrderEntities.getInstance().getPurchasesFilterByStatus(statusValue.Value);
+
+                foreach (var order in _viewModel.Orders)
+                {
+                    OrderModel.Customer customer = OrderEntities.getInstance().getCustomerById(order.CustomerId);
+                    order.CustomerTel = customer.Tel;
+                    order.StatusDisplayText = statusEnum[statusEnum.FindIndex(stat => stat.Value == order.Status)].DisplayText;
+                }
+
+                OrderEntities.getInstance().closeConnection();
+
+                updateView();
+            }
         }
     }
 }
