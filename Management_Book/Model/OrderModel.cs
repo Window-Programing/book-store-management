@@ -38,14 +38,14 @@ namespace Management_Book.Model
         {
             private int _id;
             private int _customerlId;
-            private float _total;
+            private double _total;
             private DateTime _createDate;
             private string _customerTel;
             private int _status;
             private string _statusDisplayText;
             public int Id { get => _id; set{_id = value;OnPropertyChanged();} }
             public int CustomerId { get => _customerlId; set { _customerlId = value; OnPropertyChanged(); } }
-            public float Total { get => _total; set { _total = value; OnPropertyChanged(); } }
+            public double Total { get => _total; set { _total = value; OnPropertyChanged(); } }
             public string CustomerTel { get => _customerTel; set { _customerTel = value; OnPropertyChanged(); } }
             public int Status { get => _status; set { _status = value; OnPropertyChanged(); } }
             public string StatusDisplayText { get => _statusDisplayText; set { _statusDisplayText = value; OnPropertyChanged(); } }
@@ -74,16 +74,16 @@ namespace Management_Book.Model
         { 
             private int _productId;
             private string _name;
-            private float _price;
+            private double _price;
             private int _quantity;
-            private float _total;
+            private double _total;
             private int _purchaseId;
 
             public int ProductId { get => _productId; set { _productId = value; OnPropertyChanged(); } }
             public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
             public int Quantity { get => _quantity; set { _quantity = value; OnPropertyChanged(); } }
-            public float Price { get => _price; set { _price = value; OnPropertyChanged(); } }
-            public float Total { get => _total; set { _total = value ; OnPropertyChanged(); } }
+            public double Price { get => _price; set { _price = value; OnPropertyChanged(); } }
+            public double Total { get => _total; set { _total = value ; OnPropertyChanged(); } }
             public int PurchaseId { get => _purchaseId; set { _purchaseId = value; OnPropertyChanged(); } }
 
             public event PropertyChangedEventHandler PropertyChanged;

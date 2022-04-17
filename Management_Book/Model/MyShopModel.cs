@@ -65,16 +65,16 @@ namespace Management_Book.Model
         {
             private int _id;
             private string _name;
-            private float _price;
-            private float _cost;
+            private double _price;
+            private double _cost;
             private int _quantity;
             private string _image;
             private Category _category;
 
             public int Id { get => _id; set { _id = value; OnPropertyChanged(); } }
             public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
-            public float Price { get => _price; set { _price = value; OnPropertyChanged(); } }
-            public float Cost { get => _cost; set { _cost = value; OnPropertyChanged(); } }
+            public double Price { get => _price; set { _price = value; OnPropertyChanged(); } }
+            public double Cost { get => _cost; set { _cost = value; OnPropertyChanged(); } }
             public int Quantity { get => _quantity; set { _quantity = value; OnPropertyChanged(); } }
             public string Image { get => _image; set { _image = value; OnPropertyChanged(); } }
             public Category Category { get => _category; set { _category = value; OnPropertyChanged(); } }

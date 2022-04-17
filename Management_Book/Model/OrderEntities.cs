@@ -123,7 +123,7 @@ namespace Management_Book.Model
 
         public List<OrderModel.Purchase> getAllPurchase()
         {
-            var sql = $"SELECT * FROM Purchase";
+            var sql = $"SELECT * FROM Purchase ORDER BY create_at DESC";
 
             SqlCommand command = new SqlCommand(sql, connection);
             var reader = command.ExecuteReader();
@@ -135,7 +135,7 @@ namespace Management_Book.Model
                 listPurchase.Add(new OrderModel.Purchase()
                 {
                     Id = reader.GetInt32(0),
-                    Total = (float)reader.GetDouble(1),
+                    Total = reader.GetDouble(1),
                     CreateDate = reader.GetDateTime(2),
                     CustomerId = reader.GetInt32(3),
                     Status = reader.GetInt32(4),
@@ -143,6 +143,101 @@ namespace Management_Book.Model
             }
 
             return listPurchase;
+        }
+
+        public List<OrderModel.Purchase> getPurchasesFilterByDate(DateTime fromDate, DateTime toDate)
+        {
+            var sql = $"SELECT * FROM Purchase " +
+                        $"WHERE {PurchaseTableField.CreateAt} >= @fromDate and {PurchaseTableField.CreateAt} <= @toDate " +
+                        $"ORDER BY create_at DESC";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@fromDate", fromDate);
+            command.Parameters.AddWithValue("@toDate", toDate);
+
+            var reader = command.ExecuteReader();
+
+            List<OrderModel.Purchase> listPurchase = new List<OrderModel.Purchase>();
+
+            while (reader.Read())
+            {
+                listPurchase.Add(new OrderModel.Purchase()
+                {
+                    Id = reader.GetInt32(0),
+                    Total = reader.GetDouble(1),
+                    CreateDate = reader.GetDateTime(2),
+                    CustomerId = reader.GetInt32(3),
+                    Status = reader.GetInt32(4),
+                });
+            }
+
+            return listPurchase;
+        }
+
+        public List<OrderModel.Purchase> getPurchasesFilterByStatus(int statusValue)
+        {
+            var sql = $"SELECT * FROM Purchase " +
+                        $"WHERE {PurchaseTableField.Status} = @status " +
+                        $"ORDER BY create_at DESC";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@status", statusValue);
+
+            var reader = command.ExecuteReader();
+
+            List<OrderModel.Purchase> listPurchase = new List<OrderModel.Purchase>();
+
+            while (reader.Read())
+            {
+                listPurchase.Add(new OrderModel.Purchase()
+                {
+                    Id = reader.GetInt32(0),
+                    Total = reader.GetDouble(1),
+                    CreateDate = reader.GetDateTime(2),
+                    CustomerId = reader.GetInt32(3),
+                    Status = reader.GetInt32(4),
+                });
+            }
+
+            return listPurchase;
+        }
+
+        public void updatePurchase(OrderModel.Purchase targetpurchase)
+        {
+            var sql = $"UPDATE Purchase SET {PurchaseTableField.CreateAt} = @create_at, {PurchaseTableField.Total} = @total, " +
+                $"{PurchaseTableField.CustomerTel} =  @tel, {PurchaseTableField.Status} = @stat " +
+                $"WHERE {PurchaseTableField.ID} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", targetpurchase.Id);
+            command.Parameters.AddWithValue("@create_at", targetpurchase.CreateDate);
+            command.Parameters.AddWithValue("@total", targetpurchase.Total);
+            command.Parameters.AddWithValue("@tel", targetpurchase.CustomerId);
+            command.Parameters.AddWithValue("@stat", targetpurchase.Status);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void updatePurchaseStatus(int purchaseId, int statusValue)
+        {
+            var sql = $"UPDATE Purchase SET {PurchaseTableField.Status} = @statusValue " +
+                $"WHERE {PurchaseTableField.ID} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", purchaseId);
+            command.Parameters.AddWithValue("@statusValue", statusValue);
+
+            command.ExecuteNonQuery();
+        }
+
+        public void deletePurchase(int id)
+        {
+            var sql = $"DELETE FROM Purchase WHERE {PurchaseTableField.ID} = @id;";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", id);
+
+            command.ExecuteNonQuery();
         }
 
         public void insertPurchaseDetail(OrderModel.PurchaseProduct purchaseProduct)
@@ -179,14 +274,24 @@ namespace Management_Book.Model
                 {
                     PurchaseId = reader.GetInt32(1),
                     ProductId = reader.GetInt32(2),
-                    Price = (float) reader.GetDouble(3),
+                    Price = reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
-                    Total = (float)reader.GetDouble(5),
+                    Total = reader.GetDouble(5),
                     Name = reader.GetString(7),
                 });
             }
 
             return listPurchaseProduct;
+        }
+
+        public void deleteProductPurchaseDetail(int purchaseId)
+        {
+            var sql = $"DELETE FROM PurchaseDetail WHERE {PurchaseDetailTableField.PurchaseID} = @id;";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", purchaseId);
+
+            command.ExecuteNonQuery();
         }
 
         public int insertCustomer(OrderModel.Customer customer)
@@ -210,6 +315,21 @@ namespace Management_Book.Model
             {
                 return oldCustomer.Id;
             }
+        }
+
+        public void updateCustomer(OrderModel.Customer customer)
+        {
+            var sql = $"UPDATE Customer SET {CustomerTableField.Name} = @name, {CustomerTableField.Address} = @address, " +
+                    $"{CustomerTableField.Email} = @email " +
+                    $"WHERE {CustomerTableField.Tel} like @tel";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@name", customer.Name);
+            command.Parameters.AddWithValue("@address", customer.Address);
+            command.Parameters.AddWithValue("@email", customer.Email);
+            command.Parameters.AddWithValue("@tel", customer.Tel);
+
+            command.ExecuteNonQuery();
         }
 
         public OrderModel.Customer getCustomerByTel(string tel)
