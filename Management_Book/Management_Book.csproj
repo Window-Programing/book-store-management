@@ -90,8 +90,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\OrderEntities.cs" />
+    <Compile Include="Model\OrderModel.cs" />
     <Compile Include="UserControls\InputNewCategory.xaml.cs">
       <DependentUpon>InputNewCategory.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InputNewOrder.xaml.cs">
+      <DependentUpon>InputNewOrder.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\InputNewProduct.xaml.cs">
       <DependentUpon>InputNewProduct.xaml</DependentUpon>
@@ -117,6 +122,10 @@
       <DependentUpon>Frm_Regis.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\InputNewCategory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InputNewOrder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
