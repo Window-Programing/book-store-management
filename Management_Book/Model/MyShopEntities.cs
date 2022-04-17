@@ -178,6 +178,16 @@ namespace Management_Book.Model
 
             command.ExecuteNonQuery();
         }
+        public void updateQuantityProduct(int productId, int quantity)
+        {
+            var sql = $"UPDATE Product SET {ProductTableField.Quantity} = @quantity WHERE {ProductTableField.ID} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", productId);
+            command.Parameters.AddWithValue("@quantity", quantity);
+
+            command.ExecuteNonQuery();
+        }
         public void deleteProduct(int id)
         {
             var sql = $"DELETE FROM Product WHERE {ProductTableField.ID}=@id;";
@@ -201,8 +211,8 @@ namespace Management_Book.Model
                 products.Add(new MyShopModel.Product() {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = (float)reader.GetDouble(2),
-                    Cost = (float)reader.GetDouble(3),
+                    Price = reader.GetDouble(2),
+                    Cost = reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
                     Image = reader.GetString(5),
                     Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
@@ -211,7 +221,7 @@ namespace Management_Book.Model
 
             return products;
         }
-        public List<MyShopModel.Product> getProducts(int categoryId, string name)
+        public List<MyShopModel.Product> getProductsLike(int categoryId, string name)
         {
             var sql = $"SELECT * FROM Product WHERE {ProductTableField.Category} = @category AND {ProductTableField.Name} LIKE @name";
 
@@ -230,8 +240,36 @@ namespace Management_Book.Model
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = (float)reader.GetDouble(2),
-                    Cost = (float)reader.GetDouble(3),
+                    Price = reader.GetDouble(2),
+                    Cost = reader.GetDouble(3),
+                    Quantity = reader.GetInt32(4),
+                    Image = reader.GetString(5),
+                    Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
+                });
+            }
+
+            return products;
+        }
+        public List<MyShopModel.Product> getProductsLike(string name)
+        {
+            var sql = $"SELECT * FROM Product WHERE {ProductTableField.Name} LIKE @name";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@name", name + "%");
+            var reader = command.ExecuteReader();
+
+            Debug.WriteLine(command.CommandText.ToString());
+
+            var products = new List<MyShopModel.Product>();
+
+            while (reader.Read())
+            {
+                products.Add(new MyShopModel.Product()
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Price = reader.GetDouble(2),
+                    Cost = reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
                     Image = reader.GetString(5),
                     Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
@@ -257,14 +295,37 @@ namespace Management_Book.Model
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = (float)reader.GetDouble(2),
-                    Cost = (float)reader.GetDouble(3),
+                    Price = (double)reader.GetDouble(2),
+                    Cost = (double)reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
                     Image = reader.GetString(5),
                     Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }
                 });
             }
             command.Cancel();
+
+            return products;
+        }
+        public MyShopModel.Product getOneProduct(int productId)
+        {
+            var sql = $"SELECT * FROM Product WHERE {ProductTableField.ID} = @id";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@id", productId);
+            var reader = command.ExecuteReader();
+
+            var products = new MyShopModel.Product();
+
+            while (reader.Read())
+            {
+                products.Id = reader.GetInt32(0);
+                products.Name = reader.GetString(1);
+                products.Price = reader.GetDouble(2);
+                products.Cost = reader.GetDouble(3);
+                products.Quantity = reader.GetInt32(4);
+                products.Image = reader.GetString(5);
+                products.Category = new MyShopModel.Category() { Id = reader.GetInt32(6) };
+            }
 
             return products;
         }
@@ -280,7 +341,7 @@ namespace Management_Book.Model
 
         }
 
-        internal List<MyShopModel.Product> getProductsFilterByPrice(string name, int categoryId, int fromPrice, int toPrice)
+        public List<MyShopModel.Product> getProductsFilterByPrice(string name, int categoryId, int fromPrice, int toPrice)
         {
             var sql =$"SELECT * " +
                 $"FROM Product " +
@@ -305,8 +366,8 @@ namespace Management_Book.Model
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Price = (float)reader.GetDouble(2),
-                    Cost = (float)reader.GetDouble(3),
+                    Price = (double)reader.GetDouble(2),
+                    Cost = (double)reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
                     Image = reader.GetString(5),
                     Category = new MyShopModel.Category() { Id = reader.GetInt32(6) }

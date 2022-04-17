@@ -90,8 +90,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\OrderEntities.cs" />
+    <Compile Include="Model\OrderModel.cs" />
+    <Compile Include="NumberToCurrencyConverter.cs" />
     <Compile Include="UserControls\InputNewCategory.xaml.cs">
       <DependentUpon>InputNewCategory.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\InputNewOrder.xaml.cs">
+      <DependentUpon>InputNewOrder.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\InputNewProduct.xaml.cs">
       <DependentUpon>InputNewProduct.xaml</DependentUpon>
@@ -110,13 +116,14 @@
     <Compile Include="UserControls\ReportUserControl.xaml.cs">
       <DependentUpon>ReportUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UserControls\SaleUserControl.xaml.cs">
-      <DependentUpon>SaleUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Frm_Regis.xaml.cs">
       <DependentUpon>Frm_Regis.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\InputNewCategory.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\InputNewOrder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -149,10 +156,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UserControls\ReportUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UserControls\SaleUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -211,19 +214,7 @@
   <ItemGroup>
     <Resource Include="Views\regis.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ViewModel\" />
-    <Folder Include="View\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\search.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\sort-ascending.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\sort-descending.png" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

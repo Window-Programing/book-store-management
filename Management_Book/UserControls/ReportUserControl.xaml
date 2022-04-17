@@ -1,12 +1,39 @@
-﻿<UserControl x:Class="Management_Book.UserControls.ReportUserControl"
+﻿<UserControl
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Management_Book.UserControls"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" x:Class="Management_Book.UserControls.ReportUserControl"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
-    </Grid>
+             Height="550" Width="950" >
+    <DockPanel>
+        <Border Margin="10" Padding="10" CornerRadius="20" 
+                BorderThickness="1" BorderBrush="LightGray" 
+                    Background="#F5F5F5" RenderTransformOrigin="0.301,0.03">
+            <DockPanel DockPanel.Dock="Top" Margin="10,10,10,0" LastChildFill="False">
+
+                <DockPanel DockPanel.Dock="Top" LastChildFill="False">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0">
+                        <TextBlock Text="From date" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <DatePicker Margin="10,0,27,0" VerticalAlignment="Top"/>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="30,0,0,0">
+                        <TextBlock Text="To date" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <DatePicker Margin="10,0,27,0" VerticalAlignment="Top" Background="White"/>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="30,0,0,0">
+                        <dx:SimpleButton Content="Show chart" VerticalAlignment="Top" Width="75" HorizontalAlignment="Right" Click="SimpleButton_Click"/>
+                    </StackPanel>
+                </DockPanel>
+                <DataGrid Name="GridData" Margin="0,10.2,0,0.2" IsReadOnly="True" AutoGenerateColumns="False" Width="888.8" SelectionChanged="GridData_SelectionChanged">
+                    <DataGrid.Columns >
+                        <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="150" />
+                        <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue}" Width="150" />
+                        <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" Width="150" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </Border>
+    </DockPanel>
 </UserControl>

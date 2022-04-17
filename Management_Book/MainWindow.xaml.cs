@@ -171,17 +171,26 @@ namespace Management_Book
 
         private void Create_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Create Order Button Clicked");
+            var tab = dXTabControl1.Items[1] as DXTabItem;
+            var usercontrol = tab.Content as PurchaseUserControl;
+            usercontrol.HandleParentEvent(PurchaseUserControl.PurchaseAction.AddNewOrder);
         }
 
         private void Update_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Update Order Button Clicked");
+            var tab = dXTabControl1.Items[1] as DXTabItem;
+            var usercontrol = tab.Content as PurchaseUserControl;
+            usercontrol.HandleParentEvent(PurchaseUserControl.PurchaseAction.UpdateSelectedOrder);
         }
 
         private void Delete_Order_Btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-
+            Debug.WriteLine("Delete Order Button Clicked");
+            var tab = dXTabControl1.Items[1] as DXTabItem;
+            var usercontrol = tab.Content as PurchaseUserControl;
+            usercontrol.HandleParentEvent(PurchaseUserControl.PurchaseAction.DeleteSelectedOrder);
         }
 
         public class TabDataItem

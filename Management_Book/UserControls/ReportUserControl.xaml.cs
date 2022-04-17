@@ -24,5 +24,20 @@ namespace Management_Book.UserControls
         {
             InitializeComponent();
         }
+
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void SimpleButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
