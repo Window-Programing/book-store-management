@@ -9,7 +9,7 @@
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
     Title="MainWindow" 
     Height="800" Width="1000" 
-    WindowStartupLocation="CenterScreen">
+    WindowStartupLocation="CenterScreen" Closed="ThemedWindow_Closed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -29,7 +29,7 @@
             </DataTemplate>
         </Grid.Resources>
 
-        <dxr:RibbonControl x:Name="RibbonControl"  
+        <dxr:RibbonControl x:Name="controlRibbon"  
                                ApplicationButtonText="File" 
                                PageCategoryAlignment="Right"
                                RibbonStyle="Office2019" VerticalAlignment="Center" Height="158" 
@@ -37,14 +37,16 @@
 
 
             <!--region #DefaultPageCategory-->
-            <dxr:RibbonDefaultPageCategory>
-                <dxr:RibbonPage Caption="Account">
+            <dxr:RibbonDefaultPageCategory Name="groupPageRibbon">
+
+                <dxr:RibbonPage Name="PageAccount" Caption="Account">
                     <dxr:RibbonPageGroup Caption="" BorderThickness="0" Padding="10,0">
                         <dxb:BarButtonItem x:Name="Button_Logout" Content="Logout" Glyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}" RibbonStyle="SmallWithText" Padding="0,8" Margin="0" BorderThickness="0" ItemClick="Button_Logout_ItemClick"/>
                         <dxb:BarButtonItem Content="Change Pass" Glyph="{dx:DXImage SvgImages/Icon Builder/Security_Key.svg}" Padding="0,8"/>
                     </dxr:RibbonPageGroup>
                 </dxr:RibbonPage>
-                <dxr:RibbonPage Caption="Master data" Loaded="ThemedWindow_Loaded">
+
+                <dxr:RibbonPage Name="PageMasterData" Caption="Master data" Loaded="ThemedWindow_Loaded">
                     <dxr:RibbonPageGroup Caption="Import">
                         <dxb:BarButtonItem x:Name="import_btn" ItemClick="import_btn_ItemClick"  Content="Excel" LargeGlyph="{dx:DXImage SvgImages/Export/ExportToXLSX.svg}"/>
                     </dxr:RibbonPageGroup>
@@ -57,24 +59,31 @@
                         <dxb:BarButtonItem x:Name="update_product_btn" ItemClick="update_product_btn_ItemClick" Content="Update" LargeGlyph="{dx:DXImage SvgImages/XAF/Action_Edit.svg}"/>
                         <dxb:BarButtonItem x:Name="delete_product_btn" ItemClick="delete_product_btn_ItemClick" Content="Delete" LargeGlyph="{dx:DXImage SvgImages/Icon Builder/Actions_Trash.svg}"/>
                     </dxr:RibbonPageGroup>
-
                 </dxr:RibbonPage>
 
-                <dxr:RibbonPage Caption="Sale">
+                <dxr:RibbonPage Name="PageSale" Caption="Sale">
                     <dxr:RibbonPageGroup Caption="Order">
                         <dxb:BarButtonItem x:Name="Create_Order_Btn" ItemClick="Create_Order_Btn_ItemClick" Content="Create" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/NewOrder.svg}"/>
                         <dxb:BarButtonItem x:Name="Update_Order_Btn" ItemClick="Update_Order_Btn_ItemClick" Content="Update" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/Task.svg}"/>
                         <dxb:BarButtonItem x:Name="Delete_Order_Btn" ItemClick="Delete_Order_Btn_ItemClick" Content="Remove" LargeGlyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}"/>
                     </dxr:RibbonPageGroup>
+                </dxr:RibbonPage>
+
+                <dxr:RibbonPage Name="PageReport" Caption="Report">
 
                 </dxr:RibbonPage>
 
-                <dxr:RibbonPage Caption="Report">
-
+                <dxr:RibbonPage Name="PageConfig" Caption="Config">
+                    <dxr:RibbonPageGroup Caption="Database">
+                        <dxb:BarButtonItem x:Name="Config_Database_Button" ItemClick="Config_Database_Button_ItemClick" Content="Config Database" LargeGlyph="{dx:DXImage SvgImages/Spreadsheet/SelectDataMember.svg}"/>
+                    </dxr:RibbonPageGroup>
+                    <dxr:RibbonPageGroup Caption="View">
+                        <dxb:BarButtonItem x:Name="Page_Size_Button" ItemClick="Page_Size_Button_ItemClick" Content="Config Page Size" LargeGlyph="{dx:DXImage SvgImages/PDF Viewer/SinglePageView.svg}"/>
+                    </dxr:RibbonPageGroup>
                 </dxr:RibbonPage>
-
 
             </dxr:RibbonDefaultPageCategory>
+
             <!--endregion #DefaultPageCategory-->
 
         </dxr:RibbonControl>
@@ -89,9 +98,6 @@
             </dx:DXTabControl.ItemContainerStyle>
         </dx:DXTabControl>
 
-
-
-
         <!--region #RibbonStatusBarControl-->
         <dxr:RibbonStatusBarControl Grid.Row="2" Name="StatusBar" IsSizeGripVisible="True" VerticalAlignment="Center" Height="24">
             <dxr:RibbonStatusBarControl.RightItems>
@@ -103,7 +109,6 @@
             </dxr:RibbonStatusBarControl.LeftItems>
         </dxr:RibbonStatusBarControl>
         <!--endregion #RibbonStatusBarControl-->
-
     </Grid>
 
 </dx:ThemedWindow>

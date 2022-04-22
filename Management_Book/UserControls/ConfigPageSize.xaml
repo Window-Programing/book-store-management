@@ -1,0 +1,17 @@
+﻿<Window x:Class="Management_Book.UserControls.ConfigPageSize"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Management_Book.UserControls"
+        mc:Ignorable="d"
+        Title="ConfigPageSize" Height="300" Width="400" WindowStartupLocation="CenterOwner">
+    <Canvas>
+        <Label Content="Config Page Size" HorizontalContentAlignment="Center" FontSize="30" FontStyle="Oblique" Width="400" />
+        <Label Content="View row per" HorizontalContentAlignment="Center" FontSize="20" Width="400" HorizontalAlignment="Center" Canvas.Top="89" VerticalAlignment="Top" />
+        <TextBox x:Name="TextBox_PerPage" Width="200" Height="30" FontSize="15" Canvas.Left="100" Canvas.Top="124" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Button x:Name="Apply_Btn" Content="Apply" Click="Apply_Btn_Click" Width="100" Height="30" Canvas.Left="90" Canvas.Top="224" />
+        <Button x:Name="Cancel_Btn" Content="Cancel" Click="Cancel_Btn_Click" Width="100" Height="30" Canvas.Left="210" Canvas.Top="224" HorizontalAlignment="Left" VerticalAlignment="Center" />
+
+    </Canvas>
+</Window>
