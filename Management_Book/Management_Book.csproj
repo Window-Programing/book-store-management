@@ -90,9 +90,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AppConfig.cs" />
     <Compile Include="Model\OrderEntities.cs" />
     <Compile Include="Model\OrderModel.cs" />
     <Compile Include="NumberToCurrencyConverter.cs" />
+    <Compile Include="UserControls\ConfigDatabase.xaml.cs">
+      <DependentUpon>ConfigDatabase.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\ConfigPageSize.xaml.cs">
+      <DependentUpon>ConfigPageSize.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\InputNewCategory.xaml.cs">
       <DependentUpon>InputNewCategory.xaml</DependentUpon>
     </Compile>
@@ -119,6 +126,14 @@
     <Compile Include="Views\Frm_Regis.xaml.cs">
       <DependentUpon>Frm_Regis.xaml</DependentUpon>
     </Compile>
+    <Page Include="UserControls\ConfigDatabase.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\ConfigPageSize.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\InputNewCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
