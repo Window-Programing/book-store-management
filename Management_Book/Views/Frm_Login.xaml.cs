@@ -55,9 +55,13 @@ namespace Management_Book.Views
                 var entropyTextInBytes = Convert.FromBase64String(entropyText);
                 var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyTextInBytes, DataProtectionScope.CurrentUser);
                 string sourcePassword = Encoding.UTF8.GetString(passwordInBytes);
-
-                if (TxtPassword.Password == sourcePassword)
+                if ( TxtUsername.Text == "")
                 {
+                    MessageBox.Show("Input Username and Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                else if (TxtPassword.Password == sourcePassword)
+                {
+                    MessageBox.Show(sourcePassword + " - " + TxtUsername.Text);
                     MainWindow dashboard = new MainWindow();
                     dashboard.Show();
                     this.Close();
