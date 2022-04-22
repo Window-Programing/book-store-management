@@ -10,9 +10,6 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 
 using Management_Book.Views;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data.SqlClient;
 
@@ -29,6 +26,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using DevExpress.Xpf.Ribbon;
 
 namespace Management_Book
 {
@@ -45,6 +43,13 @@ namespace Management_Book
         private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
         {
 
+        }
+
+        private void Button_Logout_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            Frm_Login mv = new Frm_Login();
+            mv.Show();
+            this.Close();
         }
 
         private void import_btn_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
@@ -117,7 +122,7 @@ namespace Management_Book
                     db.closeConnection();
 
                     MessageBox.Show($"Đã thêm vào hệ thống {categories.Count} loại sản phẩm và {productCount} sản phẩm", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
-                } catch(Exception ex)
+                } catch(Exception )
                 {
                     MessageBox.Show($"Không thể định dạng dữ liệu hoặc file không tồn tại", "Thất bại", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
@@ -198,24 +203,65 @@ namespace Management_Book
             public string HeaderText { get; set; }
             public UserControl Content { get; set; }
         }
-        private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
+
+        private void Config_Database_Button_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
 
+        }
+
+        private void Page_Size_Button_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        {
+            ConfigPageSize configPageSize = new ConfigPageSize();
+            configPageSize.Owner = this;
+            configPageSize.ShowDialog();
+
+            int pageSize = configPageSize.getResult();
+
+            if (configPageSize.DialogResult == true && pageSize != -1)
+            {
+                AppConfig.setValue(AppConfig.PageSize, pageSize.ToString());
+
+            }
+
+            ((MasterDataUserControl)((DXTabItem)dXTabControl1.Items[0]).Content).reload();
+        }
+        private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
+        {
             var screen = new ObservableCollection<DXTabItem>()
                 {
                     new DXTabItem{Content = new MasterDataUserControl(), Header = "MasterData"},
                     new DXTabItem{Content = new PurchaseUserControl(), Header = "Sale"},
-                    new DXTabItem{Content = new ReportUserControl(), Header = "Report"}
+                    new DXTabItem{Content = new ReportUserControl(), Header = "Report Purchase"},
+                    new DXTabItem{Content = new ReportProductControl(), Header = "Report Product"}
                 };
 
             dXTabControl1.ItemsSource = screen;
+            dXTabControl1.SelectedIndex = Convert.ToInt32(AppConfig.getValue(AppConfig.Tab));
+
+            String namePageSave = AppConfig.getValue(AppConfig.PageRibbon);
+
+            foreach (RibbonPage page in groupPageRibbon.Pages)
+            {
+                if (page.Name == namePageSave)
+                {
+                    controlRibbon.SelectedPage = page;
+                }
+            }
         }
 
-        private void Button_Logout_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
+        private void ThemedWindow_Closed(object sender, EventArgs e)
         {
-            Frm_Login mv = new Frm_Login();
-            mv.Show();
-            this.Close();
+            int idx1 = dXTabControl1.SelectedIndex;
+
+            AppConfig.setValue(AppConfig.Tab, idx1.ToString());
+
+            foreach(RibbonPage page in groupPageRibbon.Pages)
+            {
+                if (page.IsSelected)
+                {
+                    AppConfig.setValue(AppConfig.PageRibbon, page.Name);
+                }
+            }
         }
     }
 }

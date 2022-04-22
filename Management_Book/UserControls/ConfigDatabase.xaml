@@ -1,0 +1,23 @@
+﻿<Window x:Class="Management_Book.UserControls.ConfigDatabase"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Management_Book.UserControls"
+        mc:Ignorable="d"
+        Title="ConfigDatabase" Height="450" Width="400">
+    <Canvas>
+        <Label Content="Config Database" HorizontalContentAlignment="Center" FontSize="30" FontStyle="Oblique" Width="400" />
+        <Label Content="Server" HorizontalContentAlignment="Center" FontSize="20" HorizontalAlignment="Center" Canvas.Top="116" VerticalAlignment="Top" Canvas.Left="35" />
+        <TextBox x:Name="TextBox_Server" Width="200" Height="30" FontSize="15" Canvas.Left="165" Canvas.Top="119" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+        <Label Content="Database" HorizontalContentAlignment="Center" FontSize="20" HorizontalAlignment="Left" Canvas.Top="174" VerticalAlignment="Top" Canvas.Left="35" />
+        <TextBox x:Name="TextBox_Database" Width="200" Height="30" FontSize="15" Canvas.Left="165" Canvas.Top="179" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label Content="Username" HorizontalContentAlignment="Center" FontSize="20" HorizontalAlignment="Left" Canvas.Top="226" VerticalAlignment="Top" Canvas.Left="35" />
+        <TextBox x:Name="TextBox_Username" Width="200" Height="30" FontSize="15" Canvas.Left="165" Canvas.Top="234" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+        <Label Content="Password" HorizontalContentAlignment="Center" FontSize="20" HorizontalAlignment="Left" Canvas.Top="284" VerticalAlignment="Top" Canvas.Left="37" />
+        <PasswordBox x:Name="TextBox_Password" Width="200" Height="30" FontSize="15" Canvas.Left="165" Canvas.Top="289" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Button x:Name="Apply_Btn" Content="Apply" Width="100" Height="30" Canvas.Left="85" Canvas.Top="374" />
+        <Button x:Name="Cancel_Btn" Content="Cancel" Width="100" Height="30" Canvas.Left="205" Canvas.Top="374" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+    </Canvas>
+</Window>

@@ -76,10 +76,17 @@ namespace Management_Book.UserControls
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            _viewModel.PageSize = 14;
+            _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
             updateDataSource();
         }
 
+        public void reload()
+        {
+            _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
+            updateView();
+
+            MessageBox.Show("Reload Page Size View OK");
+        }
         public void updateDataSource()
         {
             MyShopEntities db = MyShopEntities.getInstance();
@@ -316,10 +323,9 @@ namespace Management_Book.UserControls
 
                 if (_viewModel.CurrentPage > _viewModel.TotalPage)
                 {
-                    _viewModel.CurrentPage = currentPagingComboBox.Items.Count - 1;
+                    _viewModel.CurrentPage = _viewModel.TotalPage;
                 }
 
-                
                 if(_viewModel.CurrentPage < 1)
                 {
                     currentPagingComboBox.SelectedIndex = 0;

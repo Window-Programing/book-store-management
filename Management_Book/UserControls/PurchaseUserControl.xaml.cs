@@ -27,6 +27,16 @@ namespace Management_Book.UserControls
         public PurchaseUserControl()
         {
             InitializeComponent();
+
+            OrderEntities.getInstance().openConnection();
+            statusEnum = OrderEntities.getInstance().getAllStatusEnum();
+            OrderEntities.getInstance().closeConnection();
+
+            ComboBoxStatusFilter.ItemsSource = statusEnum;
+
+            _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
+            _viewModel.CurrentPage = 1;
+            updateDataSource();
         }
 
         public enum PurchaseAction
@@ -74,12 +84,20 @@ namespace Management_Book.UserControls
 
             ComboBoxStatusFilter.ItemsSource = statusEnum;
 
-            _viewModel.PageSize = 24;
+            _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
             _viewModel.CurrentPage = 1;
             updateDataSource();
         }
 
-        public void updateDataSource()
+        public void reload()
+        {
+            _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
+            updateView();
+
+            MessageBox.Show("Reload Page Size View OK");
+        }
+
+        private void updateDataSource()
         {
             OrderEntities myDB = OrderEntities.getInstance();
             myDB.openConnection();
@@ -166,7 +184,7 @@ namespace Management_Book.UserControls
 
                 if (_viewModel.CurrentPage > _viewModel.TotalPage)
                 {
-                    _viewModel.CurrentPage = currentPagingComboBox.Items.Count - 1;
+                    _viewModel.CurrentPage = _viewModel.TotalPage;
                 }
 
 

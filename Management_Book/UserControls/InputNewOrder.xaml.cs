@@ -254,7 +254,7 @@ namespace Management_Book.UserControls
                         Name = product.Name,
                         Price = product.Price,
                         Quantity = Convert.ToInt32(QuantityInput.Text),
-                        Total = product.Price * Convert.ToInt32(QuantityInput.Text)
+                        Total = product.Price * Convert.ToInt32(QuantityInput.Text),
                     };
 
                     if(_selectedProduct.Any(prd => prd.Name.Equals(selectedProduct.Name))){
@@ -269,6 +269,7 @@ namespace Management_Book.UserControls
                             _selectedProduct[idx].Quantity += selectedProduct.Quantity;
                             _selectedProduct[idx].Total += selectedProduct.Quantity * selectedProduct.Price;
                             _currentOrder.Total += selectedProduct.Quantity * selectedProduct.Price;
+                            _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
                         }
                     }
                     else
@@ -317,6 +318,7 @@ namespace Management_Book.UserControls
                     _selectedProduct[idx].Quantity++;
                     _selectedProduct[idx].Total += selectedProduct.Price;
                     _currentOrder.Total += selectedProduct.Price;
+                    _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
                 }
             }
             else
@@ -331,6 +333,7 @@ namespace Management_Book.UserControls
             if (selectedProduct != null)
             {
                 int idx = _selectedProduct.ToList().FindIndex(prd => prd.Name.Equals(selectedProduct.Name));
+                MyShopModel.Product product = MyShopEntities.getInstance().getOneProduct(selectedProduct.ProductId);
                 if (_selectedProduct[idx].Quantity - 1 < 1)
                 {
                     if(MessageBox.Show("Bạn có muốn xóa sản phẩm này khỏi đơn hàng không?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
@@ -344,6 +347,7 @@ namespace Management_Book.UserControls
                     _selectedProduct[idx].Quantity--;
                     _selectedProduct[idx].Total -= selectedProduct.Price;
                     _currentOrder.Total -= selectedProduct.Price;
+                    _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
                 }
             }
             else

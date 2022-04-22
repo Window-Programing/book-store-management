@@ -20,6 +20,19 @@ namespace Management_Book.Model
 
         private static OrderEntities Instance;
         private static readonly object _lock = new object();
+
+        private OrderEntities()
+        {
+            var server = AppConfig.getValue(AppConfig.Server);
+            var database = AppConfig.getValue(AppConfig.Database);
+            var username = AppConfig.getValue(AppConfig.Username);
+            var password = AppConfig.getValue(AppConfig.Password);
+
+            string connectionString =
+                $"Server={server};Database={database};User Id={username};Password={password};MultipleActiveResultSets=true;";
+
+            connection = new SqlConnection(connectionString);
+        }
         public static OrderEntities getInstance()
         {
             if (Instance == null)
@@ -60,6 +73,7 @@ namespace Management_Book.Model
             static public string Total = "total";
             static public string CustomerTel = "customer_id";
             static public string Status = "status";
+            static public string Profit = "profit";
         }
 
         public class PurchaseDetailTableField
@@ -165,6 +179,7 @@ namespace Management_Book.Model
                 {
                     Id = reader.GetInt32(0),
                     Total = reader.GetDouble(1),
+                    Profit = reader.GetDouble(5),
                     CreateDate = reader.GetDateTime(2),
                     CustomerId = reader.GetInt32(3),
                     Status = reader.GetInt32(4),
@@ -173,7 +188,86 @@ namespace Management_Book.Model
 
             return listPurchase;
         }
+        public List<OrderModel.Purchase> getTotalProfitFilterByDate(DateTime fromDate, DateTime toDate)
+        {
+            var sql = $"select distinct DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at)) as Date, SUM(pc.total) over (partition by DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at))) as total, SUM(pc.profit) over (partition by convert(varchar(10), pc.create_at, 120)) as profit from Purchase pc WHERE {PurchaseTableField.CreateAt} >= @fromDate and {PurchaseTableField.CreateAt} <= @toDate ";
 
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@fromDate", fromDate);
+            command.Parameters.AddWithValue("@toDate", toDate);
+
+            var reader = command.ExecuteReader();
+
+            List<OrderModel.Purchase> listPurchase = new List<OrderModel.Purchase>();
+
+            while (reader.Read())
+            {
+                listPurchase.Add(new OrderModel.Purchase()
+                {
+                    Total = reader.GetDouble(1),
+                    Profit = reader.GetDouble(2),
+                    CreateDate = reader.GetDateTime(0),
+                });
+            }
+
+            return listPurchase;
+        }
+        public List<OrderModel.ReportProduct> getReportProductFilterByDate(DateTime fromDate, DateTime toDate)
+        {
+            var sql = $"SELECT distinct pd.product_id, pd.product_name, SUM(pcd.quantity) over (partition by pcd.product_id) as quantity_sale " +
+                $"FROM Product as pd, Purchase as pc, PurchaseDetail as pcd " +
+                $"WHERE pc.create_at >= @fromDate and pc.create_at <= @toDate and pc.purchase_id = pcd.purchase_id and pd.product_id = pcd.product_id " +
+                $"ORDER BY quantity_sale DESC";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@fromDate", fromDate);
+            command.Parameters.AddWithValue("@toDate", toDate);
+
+            var reader = command.ExecuteReader();
+
+            List<OrderModel.ReportProduct> listProduct = new List<OrderModel.ReportProduct>();
+
+            while (reader.Read())
+            {
+                listProduct.Add(new OrderModel.ReportProduct()
+                {
+                    ProductId = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Quantity = reader.GetInt32(2),
+                });
+            }
+
+            return listProduct;
+        }
+        public List<OrderModel.ReportProduct> getSingleProductFilterByDate(int productId, DateTime fromDate, DateTime toDate)
+        {
+            var sql = $"SELECT distinct pd.product_id, pd.product_name, DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at)) as Date, SUM(pcd.quantity) over (partition by pcd.product_id, DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at))) as quantity_sale " +
+                $"FROM Product as pd, Purchase as pc, PurchaseDetail as pcd " +
+                $"WHERE pc.create_at >= @fromDate and pc.create_at <= @toDate and pc.purchase_id = pcd.purchase_id and pd.product_id = pcd.product_id and pd.product_id = @productId " +
+                $"ORDER BY Date ASC";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@fromDate", fromDate);
+            command.Parameters.AddWithValue("@toDate", toDate);
+            command.Parameters.AddWithValue("@productId", productId);
+
+            var reader = command.ExecuteReader();
+
+            List<OrderModel.ReportProduct> listProduct = new List<OrderModel.ReportProduct>();
+
+            while (reader.Read())
+            {
+                listProduct.Add(new OrderModel.ReportProduct()
+                {
+                    ProductId = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Quantity = reader.GetInt32(3),
+                    CreateDate = reader.GetDateTime(2),
+                });
+            }
+
+            return listProduct;
+        }
         public List<OrderModel.Purchase> getPurchasesFilterByStatus(int statusValue)
         {
             var sql = $"SELECT * FROM Purchase " +

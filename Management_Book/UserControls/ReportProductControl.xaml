@@ -6,10 +6,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Management_Book.UserControls"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" xmlns:Model="clr-namespace:Management_Book.Model" x:Class="Management_Book.UserControls.ReportUserControl"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" xmlns:Model="clr-namespace:Management_Book.Model" x:Class="Management_Book.UserControls.ReportProductControl"
              mc:Ignorable="d" 
              Height="550" Width="950" >
-    <UserControl.Resources> 
+    <UserControl.Resources>
         <dx:UnboundDataSource x:Key="UnboundDataSource" Count="0">
             <dx:DesignDataManager.DesignData>
                 <dx:DesignDataSettings RowCount="5"/>
@@ -29,11 +29,10 @@
                         <DatePicker x:Name="DatePickerTo" Margin="10,0,27,0" VerticalAlignment="Top" Background="White" SelectedDate="{x:Static sys:DateTime.Now}"/>
                         <Button x:Name="filterPrice" Click="filterPrice_Click" Content="Áp dụng" Width="70" Margin="10,0,0,0" />
                     </StackPanel>
-                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="437" SelectedCellsChanged="GridData_SelectedCellsChanged" CellStyle="{DynamicResource DataGridCellStyle1}" SelectionMode="Single" Margin="0,10,0,69.8" SelectionChanged="GridData_SelectionChanged_1">
+                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="437" SelectedCellsChanged="GridData_SelectedCellsChanged" SelectionMode="Single" Margin="0,10,0,69.8" SelectionChanged="GridData_SelectionChanged_1">
                         <DataGrid.Columns >
-                            <DataGridTextColumn Header="Date" Binding="{Binding CreateDate}" Width="150" />
-                            <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="150" />
-                            <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" Width="150" />
+                            <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="150" />
+                            <DataGridTextColumn Header="Quantity Sales" Binding="{Binding Quantity}" Width="150" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

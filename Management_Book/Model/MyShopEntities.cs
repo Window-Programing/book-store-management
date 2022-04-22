@@ -14,15 +14,22 @@ namespace Management_Book.Model
     {
         public static string ProductTable = "Product";
         public static string CategoryTable = "Category";
-        static string connectionString = ConfigurationManager.ConnectionStrings["myDatabaseConnection"].ToString();
-        static SqlConnection connection = new SqlConnection(connectionString);
+        static SqlConnection connection;
 
         private static MyShopEntities Instance;
         private static readonly object _lock = new object();
 
         private MyShopEntities()
         {
+            var server = AppConfig.getValue(AppConfig.Server);
+            var database = AppConfig.getValue(AppConfig.Database);
+            var username = AppConfig.getValue(AppConfig.Username);
+            var password = AppConfig.getValue(AppConfig.Password);
 
+            string connectionString =
+                $"Server={server};Database={database};User Id={username};Password={password};MultipleActiveResultSets=true;";
+
+            connection = new SqlConnection(connectionString);
         }
         public static MyShopEntities getInstance()
         {
@@ -70,7 +77,7 @@ namespace Management_Book.Model
                 return connection;
             }
 
-            catch (Exception ex) { }
+            catch (Exception ) { }
             return null;
         }
         public void closeConnection()
