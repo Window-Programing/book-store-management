@@ -39,5 +39,10 @@ namespace Management_Book.UserControls
         {
 
         }
+
+        private void GridData_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

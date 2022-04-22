@@ -9,7 +9,7 @@
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
     Title="MainWindow" 
     Height="800" Width="1000" 
-    WindowStartupLocation="CenterScreen" Closed="ThemedWindow_Closed">
+    WindowStartupLocation="CenterScreen" Closed="ThemedWindow_Closed" Loaded="ThemedWindow_Loaded_1">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -27,6 +27,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using DevExpress.Xpf.Ribbon;
+using System.Globalization;
+using System.Net;
 
 namespace Management_Book
 {
@@ -261,6 +263,90 @@ namespace Management_Book
                     AppConfig.setValue(AppConfig.PageRibbon, page.Name);
                 }
             }
+        }
+
+        public static bool CheckForInternetConnection(int timeoutMs = 10000, string url = null)
+        {
+            try
+            {
+                if (url == null)
+                url = CultureInfo.InstalledUICulture switch
+                {
+                    { Name: var n } when n.StartsWith("fa") => // Iran
+                        "http://www.aparat.com",
+                    { Name: var n } when n.StartsWith("zh") => // China
+                        "http://www.baidu.com",
+                    _ =>
+                        "http://www.gstatic.com/generate_204",
+                };
+
+                var request = (HttpWebRequest)WebRequest.Create(url);
+                request.KeepAlive = false;
+                request.Timeout = timeoutMs;
+                using (var response = (HttpWebResponse)request.GetResponse())
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        static object GetRegistryValue() => Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\BookManagementt", "Configuration", string.Empty);
+
+        public static DateTime GetNistTime()
+        {
+            using (WebResponse response = WebRequest.Create("https://www.microsoft.com").GetResponse())
+                return DateTime.ParseExact(response.Headers["date"], "ddd, dd MMM yyyy HH:mm:ss 'GMT'",
+                    CultureInfo.InvariantCulture.DateTimeFormat,
+                    DateTimeStyles.AssumeUniversal);
+        }
+        private void checkTrialAndCreateRegistry()
+        {
+            if (CheckForInternetConnection())
+            {
+                dynamic registryValue = GetRegistryValue();
+
+                registryValue = registryValue != null ? registryValue.ToString() : string.Empty;
+
+                //Check whether the Registry is already configured. IF not, create the registry
+                if (String.IsNullOrWhiteSpace(registryValue))
+                {
+                    registryValue = GetNistTime().ToString("dd/MM/yyyy");
+                    var softwareSubkey = Registry.LocalMachine.OpenSubKey("SOFTWARE", true);
+                    var keyData = softwareSubkey.CreateSubKey("BookManagementt");
+                    keyData.SetValue("Configuration", registryValue);
+                    keyData.Close();
+                    MessageBox.Show($"Trial date started - {registryValue}");
+                }
+                else
+                {
+                    DateTime date = DateTime.ParseExact(registryValue, "dd/MM/yyyy", System.Globalization.CultureInfo.InvariantCulture);
+                    DateTime curTime = GetNistTime();
+                    TimeSpan daysLeft = date.AddDays(15).Subtract(curTime);
+                    bool expired = date.AddDays(15) >= curTime ? false : true;
+                    if(!expired)
+                    {
+                        MessageBox.Show($"You have {daysLeft.Days} days {daysLeft.Hours} hours trial left.");
+                    } else
+                    {
+                        MessageBox.Show("Your trial period has expired!");
+                        Environment.Exit(0);
+                    }
+                    
+                }
+            }
+            else
+            {
+                MessageBox.Show("Internet connection is required to use this program!");
+                Environment.Exit(0);
+            }
+
+        }
+
+        private void ThemedWindow_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            checkTrialAndCreateRegistry();
         }
     }
 }

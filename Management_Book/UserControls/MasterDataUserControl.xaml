@@ -144,9 +144,11 @@
                         <TextBlock Margin="10, 10,0,0" Text="Tên sản phẩm" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
                         <TextBox Name="TextBox_Name" Text="{Binding ElementName=GridData, Path=SelectedItem.Name, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
                         <TextBlock Margin="10, 10,0,0" Text="Giá nhập" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Cost" Text="{Binding ElementName=GridData, Path=SelectedItem.Cost, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <!--, Converter={StaticResource currencyConverter}-->
+                        <TextBox Name="TextBox_Cost" Text="{Binding ElementName=GridData, Path=SelectedItem.Cost, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
                         <TextBlock Margin="10, 10,0,0" Text="Giá bán" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Price" Text="{Binding ElementName=GridData, Path=SelectedItem.Price, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <!--, Converter={StaticResource currencyConverter}-->
+                        <TextBox Name="TextBox_Price" Text="{Binding ElementName=GridData, Path=SelectedItem.Price, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
                         <TextBlock Margin="10, 10,0,0" Text="Số lượng" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
                         <TextBox Name="TextBox_Quantity" Text="{Binding ElementName=GridData, Path=SelectedItem.Quantity, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
                         <TextBlock Margin="10, 10,0,0" Text="Hình ảnh" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
