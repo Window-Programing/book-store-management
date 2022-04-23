@@ -18,6 +18,7 @@ using Management_Book.Model;
 using LiveCharts;
 using LiveCharts.Wpf;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Management_Book.UserControls
 {
@@ -26,8 +27,6 @@ namespace Management_Book.UserControls
     /// </summary>
     public partial class ReportUserControl : UserControl
     {
-        static string connectionString = ConfigurationManager.ConnectionStrings["myDatabaseConnection"].ConnectionString;
-        SqlConnection connection = new SqlConnection(connectionString);
         public SeriesCollection SeriesCollection { get; set; }
         public string[] CreateDate { get; set; }
         public Func<double, string> Formatter { get; set; }
@@ -38,79 +37,65 @@ namespace Management_Book.UserControls
             InitializeComponent();
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
-
-        private void TextBox_TextChanged_1(object sender, TextChangedEventArgs e)
-        {
-
-        }
-
-        private void SimpleButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-        private void GridData_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e)
-        {
-        }
-
-        private void GridData_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
-
-        private void GridData_SelectionChanged_1(object sender, SelectionChangedEventArgs e)
-        {
-
-        }
         private void filterPrice_Click(object sender, RoutedEventArgs e)
         {
             DataContext = null;
-            DateTime dateFrom = (DateTime)DatePickerFrom.SelectedDate;
-            dateFrom = dateFrom.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
-            DateTime dateTo = (DateTime)DatePickerTo.SelectedDate;
-            dateTo = dateTo.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-            Debug.WriteLine(dateFrom);
-            Debug.WriteLine(dateTo);
-
-            OrderEntities.getInstance().openConnection();
-
-            _viewModel.Orders = OrderEntities.getInstance().getTotalProfitFilterByDate(dateFrom, dateTo);
-
-            OrderEntities.getInstance().closeConnection();
-
-            GridData.ItemsSource = _viewModel.Orders;
-
-            List<double> Total = new List<double>();
-            List<double> Profit = new List<double>();
-            List<string> listDate = new List<string>(); 
-
-            foreach (OrderModel.Purchase row in _viewModel.Orders)
+            if (DatePickerFrom.SelectedDate == null || DatePickerTo.SelectedDate == null)
             {
-                Total.Add(row.Total);
-                Profit.Add(row.Profit);
-                listDate.Add(row.CreateDate.ToString().Substring(0,10));
+                MessageBox.Show("Vui lòng chọn các mốc thời gian cần xem report", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-
-            SeriesCollection = new SeriesCollection() { };
-            SeriesCollection.Add(new ColumnSeries
+            else
             {
-                Title="Total",
-                Values = new ChartValues<double> (Total)  
-            });
+                DateTime dateFrom = (DateTime)DatePickerFrom.SelectedDate;
+                DateTime dateTo = (DateTime)DatePickerTo.SelectedDate;
+                dateFrom = dateFrom.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
+                dateTo = dateTo.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-            SeriesCollection.Add(new ColumnSeries
-            {
-                Title = "Profit",
-                Values = new ChartValues<double>(Profit)
-            });
-            CreateDate = listDate.ToArray();
-            Formatter = value => value.ToString("C");
+                OrderEntities.getInstance().openConnection();
 
-            DataContext = this;
+                _viewModel.Orders = OrderEntities.getInstance().getReportPurchaseFilterByDate(dateFrom, dateTo);
+                foreach(var item in _viewModel.Orders)
+                {
+                    item.CreateDate = item.CreateDate.Date;
+                }
+
+                OrderEntities.getInstance().closeConnection();
+
+                GridData.ItemsSource = _viewModel.Orders;
+
+                List<double> Total = new List<double>();
+                List<double> Profit = new List<double>();
+                List<string> listDate = new List<string>();
+
+                foreach (OrderModel.Purchase row in _viewModel.Orders)
+                {
+                    Total.Add(row.Total);
+                    Profit.Add(row.Profit);
+                    listDate.Add(row.CreateDate.ToShortDateString());
+                }
+
+                SeriesCollection = new SeriesCollection() {
+                new LineSeries
+                {
+                    Title="Revenue",
+                    Values = new ChartValues<double> (Total)
+                },
+                new LineSeries
+                {
+                    Title = "Profit",
+                    Values = new ChartValues<double>(Profit)
+                }
+
+            };
+
+                CreateDate = listDate.ToArray();
+
+                CultureInfo cul = CultureInfo.GetCultureInfo("vi-VN");
+                Formatter = value => value.ToString("#,###", cul.NumberFormat);
+
+                DataContext = this;
+            }
         }
     }
 }

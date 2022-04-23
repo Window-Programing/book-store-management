@@ -7,9 +7,11 @@
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:Management_Book.UserControls"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors" xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core" xmlns:Custom="http://schemas.devexpress.com/winfx/2008/xaml/charts/rangecontrolclient" xmlns:Model="clr-namespace:Management_Book.Model" x:Class="Management_Book.UserControls.ReportUserControl"
+             xmlns:rootDirec="clr-namespace:Management_Book"      
              mc:Ignorable="d" 
              Height="550" Width="950" >
-    <UserControl.Resources> 
+    <UserControl.Resources>
+        <rootDirec:NumberToCurrencyConverter x:Key="currencyConverter"/>
         <dx:UnboundDataSource x:Key="UnboundDataSource" Count="0">
             <dx:DesignDataManager.DesignData>
                 <dx:DesignDataSettings RowCount="5"/>
@@ -20,30 +22,33 @@
         <Border Margin="10" Padding="10" CornerRadius="20" 
                 BorderThickness="1" BorderBrush="LightGray" 
                     Background="#F5F5F5" RenderTransformOrigin="0.301,0.03">
-            <DockPanel DockPanel.Dock="Top" Margin="10,10,10,0" LastChildFill="False">
+            <DockPanel DockPanel.Dock="Top" Margin="10,10,10,0" LastChildFill="True">
                 <DockPanel DockPanel.Dock="Left" LastChildFill="False">
                     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0">
-                        <TextBlock Text="From" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <DatePicker x:Name="DatePickerFrom" Margin="10,0,27,0" VerticalAlignment="Top" SelectedDateFormat="Short"/>
-                        <TextBlock Text="To" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <DatePicker x:Name="DatePickerTo" Margin="10,0,27,0" VerticalAlignment="Top" Background="White" SelectedDate="{x:Static sys:DateTime.Now}"/>
-                        <Button x:Name="filterPrice" Click="filterPrice_Click" Content="Áp dụng" Width="70" Margin="10,0,0,0" />
+                        <StackPanel>
+                            <TextBlock Text="From" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <DatePicker x:Name="DatePickerFrom" Margin="40,0,0,0" Width="150"  VerticalAlignment="Top" SelectedDateFormat="Short"/>
+                            <TextBlock Text="To" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            <DatePicker x:Name="DatePickerTo" Margin="40,0,0,0" Width="150" VerticalAlignment="Top" Background="White" SelectedDate="{x:Static sys:DateTime.Now}"/>
+
+                        </StackPanel>
+                        <Button x:Name="filterPrice" Click="filterPrice_Click" Content="Áp dụng" Width="70" Margin="30,15,10,40" />
                     </StackPanel>
-                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="437" SelectedCellsChanged="GridData_SelectedCellsChanged" CellStyle="{DynamicResource DataGridCellStyle1}" SelectionMode="Single" Margin="0,10,0,69.8" SelectionChanged="GridData_SelectionChanged_1">
+                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="380"  SelectionMode="Single" Margin="0,10,0,69.8" >
                         <DataGrid.Columns >
-                            <DataGridTextColumn Header="Date" Binding="{Binding CreateDate}" Width="150" />
-                            <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="150" />
-                            <DataGridTextColumn Header="Profit" Binding="{Binding Profit}" Width="150" />
+                            <DataGridTextColumn Header="Date" Binding="{Binding Path=CreateDate, StringFormat=d, ConverterCulture=en-GB}" Width="150" />
+                            <DataGridTextColumn Header="Total" Binding="{Binding Total, Converter={StaticResource currencyConverter}}" Width="110" />
+                            <DataGridTextColumn Header="Profit" Binding="{Binding Profit, Converter={StaticResource currencyConverter}}" Width="110" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Right" Margin="5,0,0,0" Width="441">
+                <StackPanel DockPanel.Dock="Right" Margin="5,0,0,0">
                     <lvc:CartesianChart Height="465" Margin="0,0,-0.2,0" Series="{Binding SeriesCollection}">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Title="Date" Labels="{Binding CreateDate}"></lvc:Axis>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis Title="$" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                            <lvc:Axis Title="VND" LabelFormatter="{Binding Formatter}"></lvc:Axis>
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                 </StackPanel>

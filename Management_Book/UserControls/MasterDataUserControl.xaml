@@ -11,6 +11,8 @@
              Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <rootDirec:NumberToCurrencyConverter x:Key="currencyConverter"/>
+        <rootDirec:RelativeToAbsolutePathConverter x:Key="imageConverter"/>
+        
         <Style x:Key="DataGridCellStyle1" TargetType="{x:Type DataGridCell}">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
@@ -139,18 +141,28 @@
                     Background="CadetBlue">
             <DockPanel LastChildFill="False">
                 <StackPanel>
-                    <TextBlock Margin="0,10,0,0" Text="Thông tin sản phẩm" TextAlignment="Center" FontSize="25" FontStyle="Italic" Foreground="White"/>
-                    <StackPanel Margin="0,100,0,0">
+                    <TextBlock Margin="0,5,0,10" Text="Thông tin sản phẩm" TextAlignment="Center" FontSize="25" FontStyle="Italic" Foreground="White"/>
+                    <Image Source="{Binding ElementName=GridData, Path=SelectedItem.Image, Converter={StaticResource imageConverter}}" Width="200" Height="200"/>
+                    <StackPanel Margin="0,10,0,0">
                         <TextBlock Margin="10, 10,0,0" Text="Tên sản phẩm" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
                         <TextBox Name="TextBox_Name" Text="{Binding ElementName=GridData, Path=SelectedItem.Name, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
-                        <TextBlock Margin="10, 10,0,0" Text="Giá nhập" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Cost" Text="{Binding ElementName=GridData, Path=SelectedItem.Cost, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
-                        <TextBlock Margin="10, 10,0,0" Text="Giá bán" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Price" Text="{Binding ElementName=GridData, Path=SelectedItem.Price, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
-                        <TextBlock Margin="10, 10,0,0" Text="Số lượng" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Quantity" Text="{Binding ElementName=GridData, Path=SelectedItem.Quantity, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Margin="10, 10,0,0" Text="Giá nhập" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
+                            <TextBox Name="TextBox_Cost" DockPanel.Dock="Right" Text="{Binding ElementName=GridData, Path=SelectedItem.Cost, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="150"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Margin="10, 10,0,0" Text="Giá bán" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
+                            <TextBox Name="TextBox_Price" DockPanel.Dock="Right" Text="{Binding ElementName=GridData, Path=SelectedItem.Price, Mode=OneWay, Converter={StaticResource currencyConverter}}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="150"/>
+                        </DockPanel>
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Margin="10, 10,0,0" Text="Số lượng" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
+                            <TextBox Name="TextBox_Quantity" DockPanel.Dock="Right" Text="{Binding ElementName=GridData, Path=SelectedItem.Quantity, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="150"/>
+                        </DockPanel>
                         <TextBlock Margin="10, 10,0,0" Text="Hình ảnh" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="White"/>
-                        <TextBox Name="TextBox_Image" Text="{Binding ElementName=GridData, Path=SelectedItem.Image, Mode=OneWay}" Margin="10, 10,0,0" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
+                        <DockPanel LastChildFill="False" Margin="10, 10,0,0">
+                            <TextBox Name="TextBox_Image" Text="{Binding ElementName=GridData, Path=SelectedItem.Image, Mode=OneWay}"  TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black" Width="170"/>
+                            <Button x:Name="browse_btn" DockPanel.Dock="Right" Margin="5, 0,0,0" Content="browse..."  Width="70" Height="30"/>
+                        </DockPanel>
                     </StackPanel>
                 </StackPanel>
             </DockPanel>

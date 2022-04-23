@@ -71,10 +71,13 @@ namespace Management_Book.UserControls
 
         OrderModel.ViewModel _viewModel = new OrderModel.ViewModel();
         List<OrderModel.PurchaseStatusEnum> statusEnum = new List<OrderModel.PurchaseStatusEnum>();
-        List<OrderModel.PurchaseProduct> _listOrderProduct = new List<OrderModel.PurchaseProduct>();
+        BindingList<OrderModel.PurchaseProduct> _listOrderProduct = new BindingList<OrderModel.PurchaseProduct>();
 
         OrderModel.Purchase selectedPurchaseRow = new OrderModel.Purchase();
         int selectedRowOrderId = -1;
+
+        static int CANCELLED_ORDER_VALUE = 3;
+        static int NEW_ORDER_VALUE = 1;
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
@@ -86,7 +89,12 @@ namespace Management_Book.UserControls
 
             _viewModel.PageSize = Convert.ToInt32(AppConfig.getValue(AppConfig.PageSize));
             _viewModel.CurrentPage = 1;
+
+            currentPagingComboBox.ItemsSource = new PagingInfo(_viewModel.TotalPage).Items;
+            currentPagingComboBox.SelectedIndex = 0;
+
             updateDataSource();
+            updateView();
         }
 
         public void reload()
@@ -250,9 +258,13 @@ namespace Management_Book.UserControls
                 {
                     OrderEntities.getInstance().openConnection();
 
-                    OrderEntities.getInstance().deleteProductPurchaseDetail(selectedPurchaseRow.Id);
+                    OrderEntities.getInstance().deletePurchaseDetail(selectedPurchaseRow.Id);
 
                     OrderEntities.getInstance().deletePurchase(selectedPurchaseRow.Id);
+
+                    cancelOrder();
+
+                    refreshInputFields();
 
                     OrderEntities.getInstance().closeConnection();
 
@@ -283,44 +295,132 @@ namespace Management_Book.UserControls
 
             if (selectedPurchaseRow != null && GridData.SelectedIndex != -1)
             {
-                OrderEntities.getInstance().openConnection();
-
-                selectedPurchaseRow.CreateDate = Convert.ToDateTime(TextBox_CreateDate.Text);
-                selectedPurchaseRow.Status = statusItem.Value;
-
-                double total;
-                double.TryParse(TextBox_Total.Text, NumberStyles.Currency, CultureInfo.GetCultureInfo("vi-VN").NumberFormat, out total);
-                selectedPurchaseRow.Total = total;
-
-                OrderEntities.getInstance().updatePurchase(selectedPurchaseRow);
-
-                OrderEntities.getInstance().updateCustomer(new OrderModel.Customer()
+                if (selectedPurchaseRow.Status != CANCELLED_ORDER_VALUE)
                 {
-                    Name = TextBox_CustomerName.Text,
-                    Email = TextBox_Email.Text,
-                    Address = TextBox_Address.Text,
-                    Tel = TextBox_Tel.Text
-                });
+                    OrderEntities.getInstance().openConnection();
+                    MyShopEntities.getInstance().openConnection();
 
-                OrderEntities.getInstance().closeConnection();
-
-                updateDataChangedFromDatabase();
-
-                for (int i = 0; i < GridData.Items.Count; i++)
-                {
-                    OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
-
-                    if (row != null && row.Id == selectedRowOrderId)
+                    OrderEntities.getInstance().updateCustomer(new OrderModel.Customer()
                     {
-                        GridData.SelectedIndex = i;
-                    }
-                }
+                        Name = TextBox_CustomerName.Text,
+                        Email = TextBox_Email.Text,
+                        Address = TextBox_Address.Text,
+                        Tel = TextBox_Tel.Text
+                    });
 
-                MessageBox.Show("Cập nhật đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    List<OrderModel.PurchaseProduct> oldList = OrderEntities.getInstance().getPurchaseProductOf(selectedPurchaseRow.Id);
+
+                    foreach (var purchaseProduct in _listOrderProduct)
+                    {
+                        MyShopModel.Product productInStock = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId);
+
+                        if (oldList.Any(pro => pro.ProductId.Equals(purchaseProduct.ProductId))) // Product exist in order -> get product in oldList -> calculate -> update new
+                        {
+                            int findIdx = oldList.FindIndex(p => p.ProductId.Equals(purchaseProduct.ProductId));
+                            int difference = purchaseProduct.Quantity - oldList[findIdx].Quantity;
+
+                            if (difference != 0)
+                            {
+                                OrderModel.PurchaseProduct newPro = purchaseProduct;
+
+                                newPro.Quantity = purchaseProduct.Quantity;
+                                newPro.Total = purchaseProduct.Quantity * purchaseProduct.Price;
+
+                                OrderEntities.getInstance().updateProductPurchaseDetail(newPro);
+                                MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, productInStock.Quantity - difference);
+                            }
+
+                            oldList.RemoveAt(findIdx);
+                        }
+                        else
+                        {
+                            int difference = productInStock.Quantity - purchaseProduct.Quantity;
+
+                            OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
+                            {
+                                PurchaseId = selectedPurchaseRow.Id,
+                                ProductId = purchaseProduct.ProductId,
+                                Price = purchaseProduct.Price,
+                            };
+
+                            if (difference >= 0)
+                            {
+                                purchaseDetail.Quantity = purchaseProduct.Quantity;
+                                purchaseDetail.Total = purchaseDetail.Quantity * purchaseDetail.Price;
+                            }
+                            else
+                            {
+                                purchaseDetail.Quantity = productInStock.Quantity;
+                                purchaseDetail.Total = purchaseDetail.Quantity * purchaseDetail.Price;
+                                difference = 0;
+                            }
+
+                            OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
+                            MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, difference);
+                        }
+                    }
+
+                    if (oldList.Count > 0)
+                    {
+                        foreach (var oldProduct in oldList)
+                        {
+                            MyShopModel.Product productInStock = MyShopEntities.getInstance().getOneProduct(oldProduct.ProductId);
+                            OrderEntities.getInstance().deleteProductInPurchaseDetail(oldProduct.PurchaseId, oldProduct.ProductId);
+                            MyShopEntities.getInstance().updateQuantityProduct(oldProduct.ProductId, productInStock.Quantity + oldProduct.Quantity);
+                        }
+                    }
+
+                    selectedPurchaseRow.CreateDate = Convert.ToDateTime(TextBox_CreateDate.Text);
+                    selectedPurchaseRow.Status = statusItem.Value;
+                    selectedPurchaseRow.Total = 0;
+                    selectedPurchaseRow.Profit = 0;
+
+                    foreach (OrderModel.PurchaseProduct pro in OrderEntities.getInstance().getPurchaseProductOf(selectedPurchaseRow.Id))
+                    {
+                        selectedPurchaseRow.Total += pro.Total;
+                        selectedPurchaseRow.Profit += pro.Total - (pro.Quantity * MyShopEntities.getInstance().getOneProduct(pro.ProductId).Cost);
+                    }
+
+                    OrderEntities.getInstance().updatePurchase(selectedPurchaseRow);
+
+                    MyShopEntities.getInstance().closeConnection();
+                    OrderEntities.getInstance().closeConnection();
+
+                    updateDataChangedFromDatabase();
+
+                    for (int i = 0; i < GridData.Items.Count; i++)
+                    {
+                        OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
+
+                        if (row != null && row.Id == selectedRowOrderId)
+                        {
+                            GridData.SelectedIndex = i;
+                        }
+                    }
+                    MessageBox.Show("Cập nhật đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Đơn hàng đã hủy không thể cập nhật", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
             }
             else
             {
                 MessageBox.Show("Vui lòng chọn đơn hàng cần cập nhật", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void cancelOrder()
+        {
+            if (_listOrderProduct.Count > 0)
+            {
+                MyShopEntities.getInstance().openConnection();
+                foreach (var oldProduct in _listOrderProduct)
+                {
+                    MyShopModel.Product productInStock = MyShopEntities.getInstance().getOneProduct(oldProduct.ProductId);
+                    MyShopEntities.getInstance().updateQuantityProduct(oldProduct.ProductId, productInStock.Quantity + oldProduct.Quantity);
+                }
+                MyShopEntities.getInstance().closeConnection();
             }
         }
 
@@ -334,11 +434,19 @@ namespace Management_Book.UserControls
             InputNewOrder inputNewOrder = new InputNewOrder();
             inputNewOrder.Owner = window;
             inputNewOrder.ShowDialog();
+            updateDataSource();
+            updateView();
         }
 
-        private void SearchInput_TextChanged(object sender, TextChangedEventArgs e)
+        private void refreshInputFields()
         {
 
+            TextBox_CustomerName.Text = "";
+            TextBox_Address.Text = "";
+            TextBox_Tel.Text = "";
+            TextBox_Email.Text = "";
+            ComboBox_Status.SelectedIndex = -1;
+            _listOrderProduct.Clear();
         }
 
         private void refreshButton_Click(object sender, RoutedEventArgs e)
@@ -356,6 +464,8 @@ namespace Management_Book.UserControls
             OrderEntities.getInstance().closeConnection();
 
             ComboBoxStatusFilter.SelectedIndex = -1;
+
+            refreshInputFields();
 
             updateView();
         }
@@ -393,7 +503,7 @@ namespace Management_Book.UserControls
                 selectedRowOrderId = selectedPurchaseRow.Id;
                 OrderEntities.getInstance().openConnection();
 
-                _listOrderProduct = OrderEntities.getInstance().getPurchaseProductOf(selectedPurchaseRow.Id);
+                _listOrderProduct = new BindingList<OrderModel.PurchaseProduct>( OrderEntities.getInstance().getPurchaseProductOf(selectedPurchaseRow.Id));
                 GridListProduct.ItemsSource = _listOrderProduct;
 
                 OrderModel.Customer customer = OrderEntities.getInstance().getCustomerByTel(selectedPurchaseRow.CustomerTel);
@@ -415,25 +525,37 @@ namespace Management_Book.UserControls
             OrderModel.PurchaseStatusEnum statusItem = ComboBox_Status.SelectedItem as OrderModel.PurchaseStatusEnum;
             if (selectedPurchaseRow != null)
             {
-                OrderEntities.getInstance().openConnection();
-
-                OrderEntities.getInstance().updatePurchaseStatus(selectedPurchaseRow.Id, statusItem.Value);
-
-                OrderEntities.getInstance().closeConnection();
-
-                updateDataChangedFromDatabase();
-
-                for (int i = 0; i < GridData.Items.Count; i++)
+                if (selectedPurchaseRow.Status != CANCELLED_ORDER_VALUE)
                 {
-                    OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
-                   
-                    if (row != null && row.Id == selectedRowOrderId)
+                    if(statusItem.Value == CANCELLED_ORDER_VALUE)
                     {
-                        GridData.SelectedIndex = i;
+                        cancelOrder();
                     }
-                }
+                    OrderEntities.getInstance().openConnection();
 
-                MessageBox.Show("Cập nhật trạng thái đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    OrderEntities.getInstance().updatePurchaseStatus(selectedPurchaseRow.Id, statusItem.Value);
+
+                    OrderEntities.getInstance().closeConnection();
+
+                    updateDataChangedFromDatabase();
+
+                    for (int i = 0; i < GridData.Items.Count; i++)
+                    {
+                        OrderModel.Purchase row = GridData.Items[i] as OrderModel.Purchase;
+
+                        if (row != null && row.Id == selectedRowOrderId)
+                        {
+                            GridData.SelectedIndex = i;
+                        }
+                    }
+
+                    MessageBox.Show("Cập nhật trạng thái đơn hàng thành công", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                } 
+                else
+                {
+                    MessageBox.Show("Đơn hàng đã hủy không thể cập nhật", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                    
 
             }
         }
@@ -457,6 +579,39 @@ namespace Management_Book.UserControls
                 OrderEntities.getInstance().closeConnection();
 
                 updateView();
+            }
+        }
+
+        private void Modify_Product_Click(object sender, RoutedEventArgs e)
+        {
+            
+            if (selectedPurchaseRow != null && GridData.SelectedIndex != -1)
+            {
+                if (selectedPurchaseRow.Status != CANCELLED_ORDER_VALUE && selectedPurchaseRow.Status == NEW_ORDER_VALUE)
+                {
+                    Application curApp = Application.Current;
+                    Window window = curApp.MainWindow;
+
+                    ModifyProductInOrder modifyProductInOrder = new ModifyProductInOrder(selectedPurchaseRow.Id, _listOrderProduct.ToList());
+                    modifyProductInOrder.Owner = window;
+                    modifyProductInOrder.ShowDialog();
+                    if (modifyProductInOrder.DialogResult == true)
+                    {
+                        _listOrderProduct.Clear();
+                        foreach (OrderModel.PurchaseProduct p in modifyProductInOrder.getResult())
+                        {
+                            _listOrderProduct.Add(p);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Đơn hàng không thể chỉnh sửa", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Vui lòng chọn đơn hàng cần cập nhật", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }

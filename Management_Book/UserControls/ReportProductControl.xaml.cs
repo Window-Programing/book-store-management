@@ -84,12 +84,12 @@ namespace Management_Book.UserControls
 
                 SeriesCollection.Add(new ColumnSeries
                 {
-                    Title = "Quantity product sold",
+                    Title = "Quantity sold",
                     Values = new ChartValues<double>(Quantity)
                 });
 
                 CreateDate = listDate.ToArray();
-                Formatter = value => value.ToString("C");
+                Formatter = value => value.ToString();
 
                 DataContext = this;
             }
@@ -106,21 +106,25 @@ namespace Management_Book.UserControls
         }
         private void filterPrice_Click(object sender, RoutedEventArgs e)
         {
-            DateTime dateFrom = (DateTime)DatePickerFrom.SelectedDate;
-            dateFrom = dateFrom.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
-            DateTime dateTo = (DateTime)DatePickerTo.SelectedDate;
-            dateTo = dateTo.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+            if(DatePickerFrom.SelectedDate == null || DatePickerTo.SelectedDate == null)
+            {
+                MessageBox.Show("Vui lòng chọn các mốc thời gian cần xem report", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            else
+            {
+                DateTime dateFrom = (DateTime)DatePickerFrom.SelectedDate;
+                DateTime dateTo = (DateTime)DatePickerTo.SelectedDate;
+                dateFrom = dateFrom.Date.AddHours(0).AddMinutes(0).AddSeconds(0);
+                dateTo = dateTo.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-            Debug.WriteLine(dateFrom);
-            Debug.WriteLine(dateTo);
+                OrderEntities.getInstance().openConnection();
 
-            OrderEntities.getInstance().openConnection();
+                _viewModel.ReProduct = OrderEntities.getInstance().getReportProductFilterByDate(dateFrom, dateTo);
 
-            _viewModel.ReProduct = OrderEntities.getInstance().getReportProductFilterByDate(dateFrom, dateTo);
+                OrderEntities.getInstance().closeConnection();
 
-            OrderEntities.getInstance().closeConnection();
-
-            GridData.ItemsSource = _viewModel.ReProduct;
+                GridData.ItemsSource = _viewModel.ReProduct;
+            } 
         }
     }
 }

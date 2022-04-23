@@ -4,8 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Management_Book.UserControls"
+        xmlns:rootDirec="clr-namespace:Management_Book"  
         mc:Ignorable="d"
         Title="InputNewProduct" Height="580" Width="500" WindowStartupLocation="CenterOwner" Loaded="Window_Loaded">
+    <Window.Resources>
+        <rootDirec:RelativeToAbsolutePathConverter x:Key="absoluteConverter" />
+    </Window.Resources>
     <StackPanel Orientation="Vertical">
         <TextBlock Margin="0,10,0,0" Text="Thông tin sản phẩm" TextAlignment="Center" FontSize="25" FontStyle="Italic" Foreground="Black"/>
         <StackPanel>
@@ -20,7 +24,7 @@
             <TextBlock Margin="10, 10,0,0" Text="Hình ảnh" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black"/>
             <StackPanel Orientation="Horizontal" Width="350" Margin="110, 0,0,0">
                 <TextBox Name="TextBox_Image" FontSize="15" FontStyle="Normal" Foreground="Black" Width="250"/>
-                <Button x:Name="browse_btn" Margin="10, 0,0,0" Content="browse..." Width="70" Height="30"/>
+                <Button x:Name="browse_btn" Margin="10, 0,0,0" Content="browse..." Click="browse_btn_Click" Width="70" Height="30"/>
             </StackPanel>
             <TextBlock Margin="10, 10,0,0" Text="Loại" TextAlignment="Left" FontSize="15" FontStyle="Normal" Foreground="Black"/>
             <ComboBox Name="Combobox_category" Margin="10, 10,0,0" FontSize="15" Width="250">

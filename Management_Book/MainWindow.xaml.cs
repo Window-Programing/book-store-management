@@ -27,6 +27,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
 using DevExpress.Xpf.Ribbon;
+using System.IO;
+using System.ComponentModel;
 
 namespace Management_Book
 {
@@ -38,17 +40,14 @@ namespace Management_Book
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void textEditor_TextChanged(object sender, TextChangedEventArgs e)
-        {
 
         }
 
         private void Button_Logout_ItemClick(object sender, DevExpress.Xpf.Bars.ItemClickEventArgs e)
         {
-            Frm_Login mv = new Frm_Login();
-            mv.Show();
+            Frm_Login loginForm = new Frm_Login();
+            loginForm.setInitial(0);
+            loginForm.Show();
             this.Close();
         }
 
@@ -71,8 +70,6 @@ namespace Management_Book
 
                     MyShopEntities db = MyShopEntities.getInstance();
                     db.openConnection();
-                    db.resetTable(MyShopEntities.ProductTable);
-                    db.resetTable(MyShopEntities.CategoryTable);
 
                     var row = 2;
                     var cell = categorySheet.Cells[$"B{row}"];
@@ -103,6 +100,36 @@ namespace Management_Book
                         int quantity = productSheet.Cells[$"F{row}"].IntValue;
                         string image = productSheet.Cells[$"G{row}"].StringValue;
 
+                        var excelFileInfo = new FileInfo(filename);
+
+                        // Lấy thư mục chứa hình ảnh đi kèm file excel
+                        var productImagesFolder = excelFileInfo.Directory + @"\products";
+
+                        // Nếu có thì mới import ảnh
+                        if (Directory.Exists(productImagesFolder))
+                        {
+
+                            // Lấy thư mục hiện hành
+                            var exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+                            var imgSubFolder = exeFolder + "Images";
+
+                            // Tạo thư mục Images để chứa ảnh
+                            if (!Directory.Exists(imgSubFolder))
+                            {
+                                Directory.CreateDirectory(imgSubFolder);
+                            }
+                            var source = productImagesFolder + @"\" + image;
+                            var sourceInfo = new FileInfo(source);
+                            var extension = sourceInfo.Extension; // Trích xuất phần đuôi
+                            var newName = Guid.NewGuid() + extension; // Tự phát sinh id duy nhất toàn hệ thống
+                            var destination = $"{imgSubFolder}\\{newName}";
+
+                            File.Copy(source, destination);
+
+                            // Cập nhật tên mới để lưu vào CSDL
+                            image = newName;
+                        }
+
                         var product = new MyShopModel.Product()
                         {
                             Name = name,
@@ -122,8 +149,9 @@ namespace Management_Book
                     db.closeConnection();
 
                     MessageBox.Show($"Đã thêm vào hệ thống {categories.Count} loại sản phẩm và {productCount} sản phẩm", "Thành công", MessageBoxButton.OK, MessageBoxImage.Information);
-                } catch(Exception )
+                } catch(Exception ex)
                 {
+                    Debug.WriteLine(ex.Message);
                     MessageBox.Show($"Không thể định dạng dữ liệu hoặc file không tồn tại", "Thất bại", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
@@ -224,6 +252,7 @@ namespace Management_Book
             }
 
             ((MasterDataUserControl)((DXTabItem)dXTabControl1.Items[0]).Content).reload();
+            ((PurchaseUserControl)((DXTabItem)dXTabControl1.Items[1]).Content).reload();
         }
         private void ThemedWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -261,6 +290,23 @@ namespace Management_Book
                 {
                     AppConfig.setValue(AppConfig.PageRibbon, page.Name);
                 }
+            }
+        }
+
+        private void dXTabControl1_SelectionChanged(object sender, TabControlSelectionChangedEventArgs e)
+        {
+            int idx = dXTabControl1.SelectedIndex;
+
+            foreach (RibbonPage page in groupPageRibbon.Pages)
+            {
+                if (idx == 0 && page.Name == "PageMasterData")
+                {
+                    controlRibbon.SelectedPage = page;
+                }
+                else if (idx == 1 && page.Name == "PageSale")
+                {
+                    controlRibbon.SelectedPage = page;
+                } 
             }
         }
     }

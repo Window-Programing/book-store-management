@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -72,6 +73,7 @@ namespace Management_Book.UserControls
         public MasterDataUserControl()
         {
             InitializeComponent();
+
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -203,15 +205,6 @@ namespace Management_Book.UserControls
                     AddNewProduct();
                     break;
                 case MasterDataAction.UpdateSelectedProduct:
-                    int id_category = ComboBoxCategory.SelectedIndex;
-
-                    productChoose.Name = TextBox_Name.Text;
-                    productChoose.Price = (float)Convert.ToDouble(TextBox_Price.Text);
-                    productChoose.Cost = (float)Convert.ToDouble(TextBox_Cost.Text);
-                    productChoose.Quantity = Convert.ToInt32(TextBox_Quantity.Text);
-                    productChoose.Image = TextBox_Image.Text;
-                    productChoose.Category = new MyShopModel.Category() { Id = categoriesDictionary[_categories[id_category].Name] };
-
                     UpdateSelectedProduct(productChoose);
                     break;
                 case MasterDataAction.DeleteSelectedProduct:
@@ -277,6 +270,18 @@ namespace Management_Book.UserControls
         private void UpdateSelectedProduct(MyShopModel.Product targetProduct)
         {
             Debug.WriteLine("Update Product Event Click");
+
+            int id_category = ComboBoxCategory.SelectedIndex;
+            double cost, price;
+            double.TryParse(TextBox_Cost.Text, NumberStyles.Currency, CultureInfo.GetCultureInfo("vi-VN").NumberFormat, out cost);
+            double.TryParse(TextBox_Price.Text, NumberStyles.Currency, CultureInfo.GetCultureInfo("vi-VN").NumberFormat, out price);
+
+            targetProduct.Name = TextBox_Name.Text;
+            targetProduct.Price = price;
+            targetProduct.Cost = cost;
+            targetProduct.Quantity = Convert.ToInt32(TextBox_Quantity.Text);
+            targetProduct.Image = TextBox_Image.Text;
+            targetProduct.Category = new MyShopModel.Category() { Id = categoriesDictionary[_categories[id_category].Name] };
 
             foreach (var product in _viewModel.SelectedProducts)
             {

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Diagnostics;
+using System.Security.Cryptography;
 
 namespace Management_Book.Model
 {
@@ -26,8 +27,17 @@ namespace Management_Book.Model
             var username = AppConfig.getValue(AppConfig.Username);
             var password = AppConfig.getValue(AppConfig.Password);
 
+            string cypherText = password;
+            var cypherTextInBytes = Convert.FromBase64String(cypherText);
+
+            string entropyText = AppConfig.getValue(AppConfig.Entropy);
+            var entropyTextInBytes = Convert.FromBase64String(entropyText);
+
+            var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyTextInBytes, DataProtectionScope.CurrentUser);
+            string realPassword = Encoding.UTF8.GetString(passwordInBytes);
+
             string connectionString =
-                $"Server={server};Database={database};User Id={username};Password={password};MultipleActiveResultSets=true;";
+                $"Server={server};Database={database};User Id={username};Password={realPassword};MultipleActiveResultSets=true;";
 
             connection = new SqlConnection(connectionString);
         }

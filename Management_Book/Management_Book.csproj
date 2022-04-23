@@ -1,4 +1,4 @@
-﻿<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Management_Book</RootNamespace>
     <AssemblyName>Management_Book</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,8 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +40,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,10 +50,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aspose.Cells">
-      <HintPath>C:\Users\ASUS\Downloads\Aspose.Cells\Aspose.Cells.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\dll\Aspose.Cells.dll</HintPath>
     </Reference>
     <Reference Include="DevExpress.Xpf.Core.v21.2" />
     <Reference Include="DevExpress.Data.Desktop.v21.2" />
@@ -64,6 +68,12 @@
     </Reference>
     <Reference Include="DevExpress.Mvvm.v21.2" />
     <Reference Include="DevExpress.Xpf.Themes.Office2019Colorful.v21.2" />
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -93,7 +103,10 @@
     <Compile Include="AppConfig.cs" />
     <Compile Include="Model\OrderEntities.cs" />
     <Compile Include="Model\OrderModel.cs" />
+    <Compile Include="Model\UserEntities.cs" />
+    <Compile Include="Model\UserModel.cs" />
     <Compile Include="NumberToCurrencyConverter.cs" />
+    <Compile Include="RelativeToAbsolutePathConverter.cs" />
     <Compile Include="UserControls\ConfigDatabase.xaml.cs">
       <DependentUpon>ConfigDatabase.xaml</DependentUpon>
     </Compile>
@@ -109,10 +122,16 @@
     <Compile Include="UserControls\InputNewProduct.xaml.cs">
       <DependentUpon>InputNewProduct.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\ModifyProductInOrder.xaml.cs">
+      <DependentUpon>ModifyProductInOrder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UserControls\PurchaseUserControl.xaml.cs">
       <DependentUpon>PurchaseUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Frm_Login.xaml.cs">
+    <Compile Include="UserControls\ReportProductControl.xaml.cs">
+      <DependentUpon>ReportProductControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Guard\Frm_Login.xaml.cs">
       <DependentUpon>Frm_Login.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\MyShopEntities.cs" />
@@ -123,7 +142,7 @@
     <Compile Include="UserControls\ReportUserControl.xaml.cs">
       <DependentUpon>ReportUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Frm_Regis.xaml.cs">
+    <Compile Include="Guard\Frm_Regis.xaml.cs">
       <DependentUpon>Frm_Regis.xaml</DependentUpon>
     </Compile>
     <Page Include="UserControls\ConfigDatabase.xaml">
@@ -146,11 +165,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UserControls\ModifyProductInOrder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UserControls\PurchaseUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Frm_Login.xaml">
+    <Page Include="UserControls\ReportProductControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Guard\Frm_Login.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -174,7 +201,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Frm_Regis.xaml">
+    <Page Include="Guard\Frm_Regis.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -199,6 +226,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="BookData.xlsx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -224,10 +252,10 @@
     <Resource Include="Images\login.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Views\login.png" />
+    <Resource Include="Guard\login.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Views\regis.png" />
+    <Resource Include="Guard\regis.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

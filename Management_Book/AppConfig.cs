@@ -13,6 +13,8 @@ namespace Management_Book
         public static string Database = "Database";
         public static string Username = "Username";
         public static string Password = "Password";
+        public static string Entropy = "Entropy";
+        public static string AutoLogin = "AutoLogin";
         public static string PageSize = "PageSize";
         public static string Tab = "Tab";
         public static string PageRibbon = "PageRibbon";

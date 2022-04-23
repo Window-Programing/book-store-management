@@ -39,14 +39,13 @@
             <!--region #DefaultPageCategory-->
             <dxr:RibbonDefaultPageCategory Name="groupPageRibbon">
 
-                <dxr:RibbonPage Name="PageAccount" Caption="Account">
+                <dxr:RibbonPage Name="PageAccount" Caption="Account" >
                     <dxr:RibbonPageGroup Caption="" BorderThickness="0" Padding="10,0">
-                        <dxb:BarButtonItem x:Name="Button_Logout" Content="Logout" Glyph="{dx:DXImage SvgImages/Outlook Inspired/Cancel.svg}" RibbonStyle="SmallWithText" Padding="0,8" Margin="0" BorderThickness="0" ItemClick="Button_Logout_ItemClick"/>
-                        <dxb:BarButtonItem Content="Change Pass" Glyph="{dx:DXImage SvgImages/Icon Builder/Security_Key.svg}" Padding="0,8"/>
+                        <dxb:BarButtonItem x:Name="Button_Logout" Content="Logout" Padding="0,8" Margin="0" BorderThickness="0" ItemClick="Button_Logout_ItemClick" RibbonStyle="Large" LargeGlyph="{dx:DXImage SvgImages/XAF/Action_Logoff.svg}" />
                     </dxr:RibbonPageGroup>
                 </dxr:RibbonPage>
 
-                <dxr:RibbonPage Name="PageMasterData" Caption="Master data" Loaded="ThemedWindow_Loaded">
+                <dxr:RibbonPage Name="PageMasterData" Caption="Master data" >
                     <dxr:RibbonPageGroup Caption="Import">
                         <dxb:BarButtonItem x:Name="import_btn" ItemClick="import_btn_ItemClick"  Content="Excel" LargeGlyph="{dx:DXImage SvgImages/Export/ExportToXLSX.svg}"/>
                     </dxr:RibbonPageGroup>
@@ -69,14 +68,8 @@
                     </dxr:RibbonPageGroup>
                 </dxr:RibbonPage>
 
-                <dxr:RibbonPage Name="PageReport" Caption="Report">
-
-                </dxr:RibbonPage>
-
                 <dxr:RibbonPage Name="PageConfig" Caption="Config">
-                    <dxr:RibbonPageGroup Caption="Database">
-                        <dxb:BarButtonItem x:Name="Config_Database_Button" ItemClick="Config_Database_Button_ItemClick" Content="Config Database" LargeGlyph="{dx:DXImage SvgImages/Spreadsheet/SelectDataMember.svg}"/>
-                    </dxr:RibbonPageGroup>
+                    
                     <dxr:RibbonPageGroup Caption="View">
                         <dxb:BarButtonItem x:Name="Page_Size_Button" ItemClick="Page_Size_Button_ItemClick" Content="Config Page Size" LargeGlyph="{dx:DXImage SvgImages/PDF Viewer/SinglePageView.svg}"/>
                     </dxr:RibbonPageGroup>
@@ -88,8 +81,10 @@
 
         </dxr:RibbonControl>
 
+        <ProgressBar Name="progStatus" Width="200" Height="30" Margin="360,61,440,511" Grid.Row="1"/>
+
         <dx:DXTabControl Grid.Row="1"
-                         Name="dXTabControl1" Loaded="ThemedWindow_Loaded">
+                         Name="dXTabControl1" Loaded="ThemedWindow_Loaded" SelectionChanged="dXTabControl1_SelectionChanged">
             <dx:DXTabControl.ItemContainerStyle>
                 <Style TargetType="dx:DXTabItem">
                     <Setter Property="Header" Value="{Binding Header}" />

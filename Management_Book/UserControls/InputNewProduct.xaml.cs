@@ -10,10 +10,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using Microsoft.Win32;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace Management_Book.UserControls
 {
@@ -29,7 +31,7 @@ namespace Management_Book.UserControls
 
         private void cancel_btn_Click(object sender, RoutedEventArgs e)
         {
-            Close(); 
+            Close();
         }
 
         private void save_btn_Click(object sender, RoutedEventArgs e)
@@ -65,6 +67,37 @@ namespace Management_Book.UserControls
             MyShopEntities.getInstance().openConnection();
             Combobox_category.ItemsSource = MyShopEntities.getInstance().getCategories();
             MyShopEntities.getInstance().closeConnection();
+        }
+
+        private void browse_btn_Click(object sender, RoutedEventArgs e)
+        {
+            var screen = new OpenFileDialog();
+
+            if (screen.ShowDialog() == true)
+            {
+                var filename = screen.FileName;
+
+                // Lấy thư mục hiện hành
+                var exeFolder = AppDomain.CurrentDomain.BaseDirectory;
+                var imgSubFolder = exeFolder + "Images";
+
+                // Tạo thư mục Images để chứa ảnh
+                if (!Directory.Exists(imgSubFolder))
+                {
+                    Directory.CreateDirectory(imgSubFolder);
+                }
+        
+                var sourceInfo = new FileInfo(filename);
+                var extension = sourceInfo.Extension; // Trích xuất phần đuôi
+                var newName = Guid.NewGuid() + extension; // Tự phát sinh id duy nhất toàn hệ thống
+                var destination = $"{imgSubFolder}\\{newName}";
+
+                File.Copy(filename, destination);
+
+                // Cập nhật tên mới để lưu vào CSDL
+                TextBox_Image.Text = newName;
+
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
     x:Class="Management_Book.Views.Frm_Login"
     Title="Frm_Login" Height="800" Width="1280" WindowStartupLocation="CenterScreen" VerticalAlignment="Center" HorizontalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ControlBoxButtonSet="Close"
-    >
+    Loaded="ThemedWindow_Loaded">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -14,7 +14,7 @@
         <Grid.Background>
             <ImageBrush ImageSource="login.png"/>
         </Grid.Background>
-        <dxe:CheckEdit Margin="778,0,310.6,242.4" Content="Save Login Information" FontSize="16" Foreground="White" Height="30" VerticalAlignment="Bottom"/>
+        <dxe:CheckEdit Name="checkLogin" Margin="778,0,170,242" Content="Save Login Information for the next time" FontSize="16" Foreground="White" Height="30" VerticalAlignment="Bottom"/>
         <dx:SimpleButton Content="OK" Margin="1028,0,145.6,168.4" RenderTransformOrigin="2.091,0.016" Click="BtnOK_Click" CornerRadius="5" Height="50" VerticalAlignment="Bottom"/>
         <TextBox x:Name="TxtUsername" Margin="778,0,145.6,401.4" TextWrapping="Wrap" Text="{x:Null}" VerticalContentAlignment="Center" FontSize="18" Height="46" VerticalAlignment="Bottom"/>
         <PasswordBox x:Name="TxtPassword" Margin="778,0,145.6,292.4" VerticalContentAlignment="Center" FontSize="18" Height="50" VerticalAlignment="Bottom"/>

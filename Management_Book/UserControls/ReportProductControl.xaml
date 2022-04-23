@@ -22,27 +22,31 @@
                     Background="#F5F5F5" RenderTransformOrigin="0.301,0.03">
             <DockPanel DockPanel.Dock="Top" Margin="10,10,10,0" LastChildFill="False">
                 <DockPanel DockPanel.Dock="Left" LastChildFill="False">
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0">
-                        <TextBlock Text="From" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <DatePicker x:Name="DatePickerFrom" Margin="10,0,27,0" VerticalAlignment="Top" SelectedDateFormat="Short"/>
-                        <TextBlock Text="To" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <DatePicker x:Name="DatePickerTo" Margin="10,0,27,0" VerticalAlignment="Top" Background="White" SelectedDate="{x:Static sys:DateTime.Now}"/>
-                        <Button x:Name="filterPrice" Click="filterPrice_Click" Content="Áp dụng" Width="70" Margin="10,0,0,0" />
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+                        <StackPanel>
+                            <TextBlock Text="From" FontSize="14" />
+                            <DatePicker x:Name="DatePickerFrom" Margin="40,0,27,0" Width="150" VerticalAlignment="Top" SelectedDateFormat="Short"/>
+
+                            <TextBlock Text="To" FontSize="14" />
+                            <DatePicker x:Name="DatePickerTo" Margin="40,0,27,0" Width="150" VerticalAlignment="Top" SelectedDate="{x:Static sys:DateTime.Now}"/>
+                        </StackPanel>
+                        <Button x:Name="filterPrice" Click="filterPrice_Click" Content="Áp dụng" Width="70" Margin="15,25,15,25"  />
                     </StackPanel>
-                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="437" SelectedCellsChanged="GridData_SelectedCellsChanged" SelectionMode="Single" Margin="0,10,0,69.8" SelectionChanged="GridData_SelectionChanged_1">
+                    <DataGrid x:Name="GridData" IsReadOnly="True" AutoGenerateColumns="False" Width="374" SelectedCellsChanged="GridData_SelectedCellsChanged" SelectionMode="Single" Margin="0,10,0,0" Height="384">
                         <DataGrid.Columns >
-                            <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="150" />
-                            <DataGridTextColumn Header="Quantity Sales" Binding="{Binding Quantity}" Width="150" />
+                            <DataGridTextColumn Header="Product" Binding="{Binding Name}" Width="299" />
+                            <DataGridTextColumn Header="Sold" Binding="{Binding Quantity}" Width="50" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
-                <StackPanel DockPanel.Dock="Right" Margin="5,0,0,0" Width="441">
-                    <lvc:CartesianChart Height="465" Margin="0,0,-0.2,0" Series="{Binding SeriesCollection}">
+                
+                <StackPanel DockPanel.Dock="Right" Margin="5,0,0,0" Width="520">
+                    <lvc:CartesianChart Height="489" Margin="0,0,-0.2,0" Series="{Binding SeriesCollection}" Width="499">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Title="Date" Labels="{Binding CreateDate}"></lvc:Axis>
                         </lvc:CartesianChart.AxisX>
                         <lvc:CartesianChart.AxisY>
-                            <lvc:Axis Title="$" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                            <lvc:Axis Title="Quan" LabelFormatter="{Binding Formatter}"></lvc:Axis>
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                 </StackPanel>

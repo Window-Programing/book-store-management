@@ -100,6 +100,7 @@ namespace Management_Book.UserControls
             GridListProduct.ItemsSource = _selectedProduct;
 
             _currentOrder.Total = 0;
+            _currentOrder.Profit = 0;
             AllProduct_Click(null, null);
         }
 
@@ -269,7 +270,7 @@ namespace Management_Book.UserControls
                             _selectedProduct[idx].Quantity += selectedProduct.Quantity;
                             _selectedProduct[idx].Total += selectedProduct.Quantity * selectedProduct.Price;
                             _currentOrder.Total += selectedProduct.Quantity * selectedProduct.Price;
-                            _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
+                            _currentOrder.Profit += (selectedProduct.Quantity * selectedProduct.Price) - (selectedProduct.Quantity * product.Cost);
                         }
                     }
                     else
@@ -282,6 +283,7 @@ namespace Management_Book.UserControls
                         {
                             _selectedProduct.Add(selectedProduct);
                             _currentOrder.Total += selectedProduct.Total;
+                            _currentOrder.Profit += selectedProduct.Total - (selectedProduct.Quantity * product.Cost);
                         }
                     }
                     
@@ -300,14 +302,13 @@ namespace Management_Book.UserControls
 
         private void Increment_Click(object sender, RoutedEventArgs e)
         {
+            MyShopEntities.getInstance().openConnection();
             OrderModel.PurchaseProduct selectedProduct = GridListProduct.SelectedItem as OrderModel.PurchaseProduct;
             if (selectedProduct != null)
             {
                 int idx = _selectedProduct.ToList().FindIndex(prd => prd.Name.Equals(selectedProduct.Name));
 
-                MyShopEntities.getInstance().openConnection();
                 MyShopModel.Product product = MyShopEntities.getInstance().getOneProduct(selectedProduct.ProductId);
-                MyShopEntities.getInstance().closeConnection();
 
                 if (_selectedProduct[idx].Quantity + 1 > product.Quantity)
                 {
@@ -318,17 +319,19 @@ namespace Management_Book.UserControls
                     _selectedProduct[idx].Quantity++;
                     _selectedProduct[idx].Total += selectedProduct.Price;
                     _currentOrder.Total += selectedProduct.Price;
-                    _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
+                    _currentOrder.Profit += selectedProduct.Price - product.Cost;
                 }
             }
             else
             {
                 MessageBox.Show("Vui lòng chọn 1 sản phẩm trong đơn hàng", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            MyShopEntities.getInstance().closeConnection();
         }
 
         private void Decrement_Click(object sender, RoutedEventArgs e)
         {
+            MyShopEntities.getInstance().openConnection();
             OrderModel.PurchaseProduct selectedProduct = GridListProduct.SelectedItem as OrderModel.PurchaseProduct;
             if (selectedProduct != null)
             {
@@ -339,6 +342,7 @@ namespace Management_Book.UserControls
                     if(MessageBox.Show("Bạn có muốn xóa sản phẩm này khỏi đơn hàng không?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         _currentOrder.Total -= _selectedProduct[idx].Total;
+                        _currentOrder.Profit -= _selectedProduct[idx].Total - (_selectedProduct[idx].Quantity * product.Cost);
                         _selectedProduct.RemoveAt(idx);
                     }
                 }
@@ -347,17 +351,19 @@ namespace Management_Book.UserControls
                     _selectedProduct[idx].Quantity--;
                     _selectedProduct[idx].Total -= selectedProduct.Price;
                     _currentOrder.Total -= selectedProduct.Price;
-                    _currentOrder.Profit = (product.Price - product.Cost) * selectedProduct.Quantity;
+                    _currentOrder.Profit -= selectedProduct.Price - product.Cost;
                 }
             }
             else
             {
                 MessageBox.Show("Vui lòng chọn 1 sản phẩm trong đơn hàng", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            MyShopEntities.getInstance().closeConnection();
         }
 
         private void Remove_Click(object sender, RoutedEventArgs e)
         {
+            MyShopEntities.getInstance().openConnection();
             OrderModel.PurchaseProduct selectedProduct = GridListProduct.SelectedItem as OrderModel.PurchaseProduct;
             if (selectedProduct != null)
             {
@@ -365,6 +371,7 @@ namespace Management_Book.UserControls
                 if (MessageBox.Show("Bạn có muốn xóa sản phẩm này khỏi đơn hàng không?", "Confirm", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     _currentOrder.Total -= _selectedProduct[idx].Total;
+                    _currentOrder.Profit -= _selectedProduct[idx].Total - (_selectedProduct[idx].Quantity * MyShopEntities.getInstance().getOneProduct(_selectedProduct[idx].ProductId).Cost);
                     _selectedProduct.RemoveAt(idx);
                 }
             }
@@ -372,6 +379,7 @@ namespace Management_Book.UserControls
             {
                 MessageBox.Show("Vui lòng chọn 1 sản phẩm trong đơn hàng", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            MyShopEntities.getInstance().closeConnection();
         }
 
         private void Create_Click(object sender, RoutedEventArgs e)
@@ -393,34 +401,28 @@ namespace Management_Book.UserControls
 
             foreach (var purchaseProduct in _selectedProduct)
             {
-                int quantity = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity - purchaseProduct.Quantity;
-                if(quantity >= 0)
+                int difference = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity - purchaseProduct.Quantity;
+
+                OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
                 {
-                    OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
-                    {
-                        PurchaseId = newPurchaseId,
-                        ProductId = purchaseProduct.ProductId,
-                        Price = purchaseProduct.Price,
-                        Quantity = purchaseProduct.Quantity,
-                        Total = purchaseProduct.Total
-                    };
-                    OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
-                    MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, quantity);
-                } else
+                    PurchaseId = newPurchaseId,
+                    ProductId = purchaseProduct.ProductId,
+                    Price = purchaseProduct.Price,
+                    Total = purchaseProduct.Total
+                };
+
+                if (difference >= 0)
                 {
-                    OrderModel.PurchaseProduct purchaseDetail = new OrderModel.PurchaseProduct()
-                    {
-                        PurchaseId = newPurchaseId,
-                        ProductId = purchaseProduct.ProductId,
-                        Price = purchaseProduct.Price,
-                        Quantity = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity,
-                        Total = purchaseProduct.Total
-                    };
-                    OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
-                    MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, 
-                        MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity);
+                    purchaseDetail.Quantity = purchaseProduct.Quantity;
                 }
-                
+                else
+                {
+                    purchaseDetail.Quantity = MyShopEntities.getInstance().getOneProduct(purchaseProduct.ProductId).Quantity;
+                    difference = 0;
+                }
+
+                OrderEntities.getInstance().insertPurchaseDetail(purchaseDetail);
+                MyShopEntities.getInstance().updateQuantityProduct(purchaseProduct.ProductId, difference);
             }
 
             MyShopEntities.getInstance().closeConnection();

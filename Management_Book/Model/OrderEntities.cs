@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,8 +29,17 @@ namespace Management_Book.Model
             var username = AppConfig.getValue(AppConfig.Username);
             var password = AppConfig.getValue(AppConfig.Password);
 
+            string cypherText = password;
+            var cypherTextInBytes = Convert.FromBase64String(cypherText);
+
+            string entropyText = AppConfig.getValue(AppConfig.Entropy);
+            var entropyTextInBytes = Convert.FromBase64String(entropyText);
+
+            var passwordInBytes = ProtectedData.Unprotect(cypherTextInBytes, entropyTextInBytes, DataProtectionScope.CurrentUser);
+            string realPassword = Encoding.UTF8.GetString(passwordInBytes);
+
             string connectionString =
-                $"Server={server};Database={database};User Id={username};Password={password};MultipleActiveResultSets=true;";
+                $"Server={server};Database={database};User Id={username};Password={realPassword};MultipleActiveResultSets=true;";
 
             connection = new SqlConnection(connectionString);
         }
@@ -48,12 +58,12 @@ namespace Management_Book.Model
             return Instance;
         }
 
-        enum PurchaseStatus
+        public enum PurchaseStatus
         {
             All = -1,
             New = 1,
-            Cancelled = 2,
-            Completed = 3,
+            Completed = 2,
+            Cancelled = 3,
             Shipping = 4
         }
 
@@ -106,18 +116,6 @@ namespace Management_Book.Model
                     connection.Close();
             }
             catch (Exception ex) { string message = ex.Message; }
-        }
-
-        public void resetTable(string tableName)
-        {
-            if (tableName == PurchaseTable || tableName == PurchaseDetailTable)
-            {
-                var sql = $"DELETE {tableName}; DBCC CHECKIDENT('{tableName}', RESEED, 0)";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.Add("@tableName", SqlDbType.NText).Value = tableName;
-
-                command.ExecuteNonQuery();
-            }
         }
 
         public int insertPurchase(OrderModel.Purchase purchase)
@@ -188,13 +186,17 @@ namespace Management_Book.Model
 
             return listPurchase;
         }
-        public List<OrderModel.Purchase> getTotalProfitFilterByDate(DateTime fromDate, DateTime toDate)
+        public List<OrderModel.Purchase> getReportPurchaseFilterByDate(DateTime fromDate, DateTime toDate)
         {
-            var sql = $"select distinct DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at)) as Date, SUM(pc.total) over (partition by DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at))) as total, SUM(pc.profit) over (partition by convert(varchar(10), pc.create_at, 120)) as profit from Purchase pc WHERE {PurchaseTableField.CreateAt} >= @fromDate and {PurchaseTableField.CreateAt} <= @toDate ";
+            var sql = $"select distinct DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at)) as Date, SUM(pc.total) over (partition by DATEADD(dd, 0, DATEDIFF(dd, 0, pc.create_at))) as total, SUM(pc.profit) over (partition by convert(varchar(10), pc.create_at, 120)) as profit " +
+                        $"from Purchase pc " +
+                        $"WHERE {PurchaseTableField.CreateAt} >= @fromDate and {PurchaseTableField.CreateAt} <= @toDate  and ({PurchaseTableField.Status} = @complete or {PurchaseTableField.Status} = @shipping) ";
 
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@fromDate", fromDate);
             command.Parameters.AddWithValue("@toDate", toDate);
+            command.Parameters.AddWithValue("@complete", PurchaseStatus.Completed);
+            command.Parameters.AddWithValue("@shipping", PurchaseStatus.Shipping);
 
             var reader = command.ExecuteReader();
 
@@ -299,7 +301,7 @@ namespace Management_Book.Model
         public void updatePurchase(OrderModel.Purchase targetpurchase)
         {
             var sql = $"UPDATE Purchase SET {PurchaseTableField.CreateAt} = @create_at, {PurchaseTableField.Total} = @total, " +
-                $"{PurchaseTableField.CustomerTel} =  @tel, {PurchaseTableField.Status} = @stat " +
+                $"{PurchaseTableField.CustomerTel} =  @tel, {PurchaseTableField.Status} = @stat, {PurchaseTableField.Profit} = @profit " +
                 $"WHERE {PurchaseTableField.ID} = @id";
 
             SqlCommand command = new SqlCommand(sql, connection);
@@ -308,6 +310,7 @@ namespace Management_Book.Model
             command.Parameters.AddWithValue("@total", targetpurchase.Total);
             command.Parameters.AddWithValue("@tel", targetpurchase.CustomerId);
             command.Parameters.AddWithValue("@stat", targetpurchase.Status);
+            command.Parameters.AddWithValue("@profit", targetpurchase.Profit);
 
             command.ExecuteNonQuery();
         }
@@ -339,12 +342,24 @@ namespace Management_Book.Model
             var sql = $"INSERT INTO PurchaseDetail ({PurchaseDetailTableField.PurchaseID}, {PurchaseDetailTableField.ProductID}, {PurchaseDetailTableField.Price}, {PurchaseDetailTableField.Quantity}, {PurchaseDetailTableField.Total}) " +
                 $"VALUES(@purchase_id, @product_id, @price, @quantity, @total)";
 
-
-
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@purchase_id", purchaseProduct.PurchaseId);
             command.Parameters.AddWithValue("@product_id", purchaseProduct.ProductId);
             command.Parameters.AddWithValue("@price", purchaseProduct.Price);
+            command.Parameters.AddWithValue("@quantity", purchaseProduct.Quantity);
+            command.Parameters.AddWithValue("@total", purchaseProduct.Total);
+            Debug.WriteLine(command.CommandText.ToString());
+            command.ExecuteNonQuery();
+        }
+
+        public void updateProductPurchaseDetail(OrderModel.PurchaseProduct purchaseProduct)
+        {
+            var sql = $"UPDATE PurchaseDetail  SET {PurchaseDetailTableField.Quantity} = @quantity, {PurchaseDetailTableField.Total} = @total " +
+                $"WHERE {PurchaseDetailTableField.PurchaseID} = @purchaseId AND {PurchaseDetailTableField.ProductID} = @productId";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@purchaseId", purchaseProduct.PurchaseId);
+            command.Parameters.AddWithValue("@productId", purchaseProduct.ProductId);
             command.Parameters.AddWithValue("@quantity", purchaseProduct.Quantity);
             command.Parameters.AddWithValue("@total", purchaseProduct.Total);
             Debug.WriteLine(command.CommandText.ToString());
@@ -378,12 +393,47 @@ namespace Management_Book.Model
             return listPurchaseProduct;
         }
 
-        public void deleteProductPurchaseDetail(int purchaseId)
+        public OrderModel.PurchaseProduct getPurchaseProductOf(int purchaseId, int productId)
+        {
+            var sql = $"SELECT * FROM PurchaseDetail " +
+                      $"WHERE {PurchaseDetailTableField.PurchaseID} = @purchaseId AND {PurchaseDetailTableField.ProductID} = @productId";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@purchaseId", purchaseId);
+            command.Parameters.AddWithValue("@productId", productId);
+            var reader = command.ExecuteReader();
+
+            OrderModel.PurchaseProduct purchaseProduct = null;
+
+            while (reader.Read())
+            {
+                purchaseProduct = new OrderModel.PurchaseProduct();
+                purchaseProduct.PurchaseId = reader.GetInt32(1);
+                purchaseProduct.ProductId = reader.GetInt32(2);
+                purchaseProduct.Price = reader.GetDouble(3);
+                purchaseProduct.Quantity = reader.GetInt32(4);
+                purchaseProduct.Total = reader.GetDouble(5);
+            }
+
+            return purchaseProduct;
+        }
+
+        public void deletePurchaseDetail(int purchaseId)
         {
             var sql = $"DELETE FROM PurchaseDetail WHERE {PurchaseDetailTableField.PurchaseID} = @id;";
 
             SqlCommand command = new SqlCommand(sql, connection);
             command.Parameters.AddWithValue("@id", purchaseId);
+
+            command.ExecuteNonQuery();
+        }
+        public void deleteProductInPurchaseDetail(int purchaseId, int productId)
+        {
+            var sql = $"DELETE FROM PurchaseDetail WHERE {PurchaseDetailTableField.PurchaseID} = @purchaseId AND {PurchaseDetailTableField.ProductID} = @productId;";
+
+            SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@purchaseId", purchaseId);
+            command.Parameters.AddWithValue("@productId", productId);
 
             command.ExecuteNonQuery();
         }
